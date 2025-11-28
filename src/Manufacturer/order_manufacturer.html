@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bazaar-bg: #f5ebe3;
+      --primary: #b88c2b;
+      --accent: #e0c68c;
+      --tab-active: #ffe7b3;
+      --tab-inactive: #fffbe6;
+      --border: #e0c68c;
+      --text: #3e2723;
+    }
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: transparent;
+      color: var(--text);
+      min-height: 100vh;
+    }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      background: var(--bazaar-bg);
+      border-bottom: 2px solid var(--border);
+      gap: 18px;
+
+    }
+     .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover {
+      color: #a67c52;
+    }
+    .header-title {
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .profile-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f5e1b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--border);
+      cursor: pointer;
+    }
+    .profile-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #8d6e3f;
+    }
+    .main-content {
+      display: flex;
+      padding: 32px 38px;
+      gap: 32px;
+    }
+    .sidebar {
+      width: 220px;
+      background: var(--bazaar-bg);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(180,140,60,0.06);
+      padding: 24px 18px;
+      border: 2px solid var(--border);
+      height: fit-content;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+      background: #fff;
+      border-radius: 22px;
+      border: 2px solid #e0c68c;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 0;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: transparent;
+      border-radius: 22px 0 0 22px;
+    }
+    .search-box button {
+      background: #fffbe6;
+      border: none;
+      border-left: 2px solid #e0c68c;
+      border-radius: 0 22px 22px 0;
+      padding: 8px 18px 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
+    .search-box button:active {
+      background: #ffe7b3;
+    }
+    .search-box button svg {
+      width: 20px;
+      height: 20px;
+    }
+    .filters-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    .filters-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .filters-list label {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      cursor: pointer;
+      gap: 8px;
+    }
+    .filters-list input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+    .order-section {
+      flex: 1;
+      background: var(--bazaar-bg);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(180,140,60,0.06);
+      padding: 24px 24px 32px 24px;
+      border: 2px solid var(--border);
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .order-tabs {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .order-tab {
+      padding: 7px 22px;
+      border-radius: 18px;
+      border: 2px solid var(--border);
+      background: var(--tab-inactive);
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.18s, border 0.18s;
+      margin-right: 8px;
+    }
+    .order-tab.active, .order-tab:hover {
+      background: var(--tab-active);
+      border-color: var(--primary);
+      font-weight: bold;
+    }
+    .order-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+      margin-top: 10px;
+    }
+    .order-table th, .order-table td {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 1rem;
+    }
+    .order-table th {
+      color: #6d4c1e;
+      font-weight: bold;
+      background: #fffbe6;
+      border-bottom: 2px solid var(--border);
+    }
+    .order-table tr {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(180,140,60,0.04);
+    }
+    .order-table td {
+      border-bottom: 1px solid #f5ebe3;
+    }
+    .order-table td:last-child {
+      text-align: center;
+    }
+    .view-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.18s;
+    }
+    .view-btn:hover {
+      background: #a67c52;
+    }
+    @media (max-width: 900px) {
+      .main-content {
+        flex-direction: column;
+        padding: 18px 4vw;
+        gap: 18px;
+      }
+      .sidebar {
+        width: 100%;
+        margin-bottom: 18px;
+      }
+      .order-section {
+        padding: 14px 6px 24px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="header">
+    <a href="bazaar-homepage.html" class="back-link" title="Back to Home">&#8592; Home</a>
+    <span class="header-title">Order Management</span>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="5"/>
+        <path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/>
+      </svg>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="sidebar">
+      <form class="search-box" onsubmit="return false;">
+        <input type="text" placeholder="Search" aria-label="Search orders">
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#4a90e2" stroke-width="2"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#a259c4" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </form>
+      <div class="filters-title">Filters</div>
+      <div class="filters-list">
+        <label><input type="checkbox" checked> Active</label>
+        <label><input type="checkbox" checked> Price</label>
+        <label><input type="checkbox" checked> Shareable</label>
+        <label><input type="checkbox" checked> Exclusive</label>
+      </div>
+    </div>
+    <div class="order-section">
+      <div class="order-tabs">
+        <button class="order-tab active">New</button>
+        <button class="order-tab">In Progress</button>
+        <button class="order-tab">Completed</button>
+      </div>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Order ID</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>View</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>#1001</td>
+            <td>Textiles</td>
+            <td>50</td>
+            <td>₹12,000</td>
+            <td><button class="view-btn">View</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>#1002</td>
+            <td>Fabrics</td>
+            <td>30</td>
+            <td>₹8,500</td>
+            <td><button class="view-btn">View</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>#1003</td>
+            <td>Accessories</td>
+            <td>20</td>
+            <td>₹3,200</td>
+            <td><button class="view-btn">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bazaar-e-Hind - Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts for Indian Cultural Look -->
+  <link href="https://fonts.googleapis.com/css?family=Corinthia" rel="stylesheet">
+</head>
+<body>
+  <!-- Video Background -->
+  <video autoplay muted loop id="bg-video">
+    <source src="../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
+  <!-- Sign Up Form -->
+  <div class="form-container">
+    <h1 class="brand-title">Bazaar-e-Hind</h1>
+    <h2>Sign Up</h2>
+
+  Already have an account? 
+  <a href="login.html">Login</a>
+    <form action="signup.php" method="POST">
+      <label for="role">Role:</label>
+      <select name="role" id="role" required>
+        <option value="manufacturer">Manufacturer</option>
+        <option value="wholesaler">Wholesaler</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <label for="username">Username:</label>
+      <input type="text" name="username" required>
+
+      <label for="email">Email:</label>
+      <input type="email" name="email" required>
+
+      <label for="password">Password:</label>
+      <input type="password" name="password" required>
+
+      <label for="company">Company Name:</label>
+      <input type="text" name="company">
+
+      <label for="contact">Contact No:</label>
+      <input type="tel" id="contact" name="contact" required>
+
+      <label for="gst">GST Details:</label>
+      <input type="text" id="gst" name="gst" required>
+
+      <label for="logo">Logo:</label>
+      <input type="file" id="logo" name="logo" accept="image/*">
+
+<!-- Replace this old button -->
+<!-- <button type="submit">Register</button> -->
+
+<!-- New coin submit -->
+<input type="image" src="../assests/coin.png" alt="Register" class="coin-submit">
+    </form>
+  </div>
+
+  
+</body>
+</html>

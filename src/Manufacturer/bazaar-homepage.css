@@ -1,0 +1,460 @@
+/* Main content wrapper for centering and stacking */
+.bazaar-content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.bazaar-header {
+  width: 100vw;
+  text-align: center;
+  margin-top: 2.5vw;
+  margin-bottom: 2vw;
+  z-index: 3;
+}
+.bazaar-header {
+  width: 100vw;
+  text-align: center;
+  margin-top: 2.5vw;
+  margin-bottom: 2vw;
+  z-index: 3;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bazaar-header-bg {
+  display: inline-block;
+  background: rgba(72, 50, 28, 0.55);
+  border-radius: 18px;
+  padding: 1.2rem 2.5rem 1.1rem 2.5rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 32px 0 #0008;
+}
+.bazaar-header h1 {
+  font-size: 3.4rem;
+  color: #fff8e1;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 6px 32px #000c, 0 2px 8px #7a4c1e99, 0 1px 0 #fff8e1;
+  font-family: 'Marcellus', serif;
+  line-height: 1.1;
+}
+.bazaar-header p {
+  font-size: 1.35rem;
+  color: #fff8e1;
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 0 2px 8px #000a, 0 2px 8px #7a4c1e55;
+  font-family: 'Marcellus', serif;
+  line-height: 1.2;
+}
+.bazaar-header h1 {
+  font-size: 3.2rem;
+  color: #fff8e1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 4px 24px #7a4c1e99, 0 1px 0 #fff8e1;
+  font-family: 'Marcellus', serif;
+}
+.bazaar-header p {
+  font-size: 1.25rem;
+  color: #fff8e1;
+  margin: 0;
+  font-weight: 400;
+  text-shadow: 0 2px 8px #7a4c1e55;
+  font-family: 'Marcellus', serif;
+}
+
+.tent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2.2rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto 3vw auto;
+  z-index: 2;
+  position: relative;
+  padding: 0 2vw;
+}
+
+.tent-card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px 0 rgba(80, 40, 10, 0.18), 0 1.5px 0 #fff8e1;
+  cursor: pointer;
+  min-height: 260px;
+  background: #fff8e1;
+  background-size: 140% auto !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.tent-card:hover, .tent-card:focus {
+  transform: scale(1.045) translateY(-6px);
+  box-shadow: 0 16px 48px 0 #e09b3d99, 0 1.5px 0 #fff8e1;
+  z-index: 3;
+}
+.tent-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  filter: brightness(0.92) saturate(1.1);
+  transition: filter 0.18s;
+}
+.tent-card:hover .tent-bg, .tent-card:focus .tent-bg {
+  filter: brightness(1.05) saturate(1.2) blur(0.5px);
+}
+.tent-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0.38) 100%);
+}
+.tent-content {
+  position: relative;
+  z-index: 3;
+  color: #fff8e1;
+  padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.tent-icon {
+  font-size: 2.2rem;
+  margin-bottom: 1.1rem;
+  color: #fff8e1;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 8px #0008);
+}
+.tent-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 8px #7a4c1e99;
+}
+.tent-desc {
+  font-size: 1.01rem;
+  font-weight: 400;
+  color: #fff8e1;
+  opacity: 0.93;
+  text-shadow: 0 1px 4px #7a4c1e55;
+}
+
+.bazaar-footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  background: rgba(60,30,10,0.55);
+  color: #fff8e1;
+  text-align: center;
+  padding: 1.1rem 0 1.1rem 0;
+  font-size: 1.08rem;
+  font-family: 'Marcellus', serif;
+  font-weight: 500;
+  border-top: 2px solid #fff8e1;
+  box-shadow: 0 -2px 12px 0 #7a4c1e44;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+}
+.bazaar-footer a {
+  color: #fff8e1;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.18s;
+  font-weight: 600;
+}
+.bazaar-footer a:hover {
+  color: #ffe066;
+  text-decoration: underline;
+}
+.footer-sep {
+  color: #ffe066;
+  font-weight: 700;
+  margin: 0 0.2rem;
+}
+
+@media (max-width: 900px) {
+  .bazaar-header h1 {
+    font-size: 2.2rem;
+  }
+  .tent-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem 1.2rem;
+    padding: 0 1vw;
+  }
+  .tent-card {
+    min-height: 180px;
+  }
+}
+@media (max-width: 600px) {
+  .bazaar-header {
+    margin-top: 1.2vw;
+    margin-bottom: 1vw;
+  }
+  .bazaar-header h1 {
+    font-size: 1.3rem;
+  }
+  .bazaar-header p {
+    font-size: 0.98rem;
+  }
+  .tent-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem 0.7rem;
+    padding: 0 0.5vw;
+  }
+  .tent-card {
+    min-height: 120px;
+  }
+  .bazaar-footer {
+    font-size: 0.98rem;
+    padding: 0.7rem 0 0.7rem 0;
+  }
+}
+@import url('https://fonts.googleapis.com/css2?family=Marcellus&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Marcellus', serif;
+  background-image: url('../../assests/bazaar-background.jpg');
+}
+
+
+.video-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.video-bg {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  filter: brightness(0.7) blur(0.5px);
+}
+
+
+/* Remove .bazaar-bg and .bazaar-tent-card if not used in new layout */
+
+
+
+
+/* Remove .bazaar-tent-card if not used in new layout */
+
+/* Tent grid for new layout */
+.tent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2.2rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto 3vw auto;
+  z-index: 2;
+  position: relative;
+  padding: 0 2vw;
+}
+
+
+
+.bazaar-tent-btn:focus, .bazaar-tent-btn:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 8px 32px 0 rgba(224, 155, 61, 0.25), 0 0 0 4px #ffe06655;
+  z-index: 4;
+}
+
+.tent-3d {
+  position: relative;
+  width: 120px;
+  height: 100px;
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tent-top {
+  width: 100px;
+  height: 40px;
+  background: inherit;
+  border-radius: 60% 60% 30% 30%/80% 80% 20% 20%;
+  box-shadow: 0 6px 18px 0 rgba(0,0,0,0.10);
+  position: absolute;
+  top: 0;
+  left: 10px;
+  z-index: 2;
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 8px, transparent 8px 16px);
+}
+
+.tent-body {
+  width: 120px;
+  height: 60px;
+  background: inherit;
+  border-radius: 0 0 40% 40%/0 0 80% 80%;
+  position: absolute;
+  top: 32px;
+  left: 0;
+  z-index: 1;
+  box-shadow: 0 12px 24px 0 rgba(0,0,0,0.13);
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 12px, transparent 12px 24px);
+}
+
+.tent-shadow {
+  width: 80px;
+  height: 18px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, transparent 80%);
+  position: absolute;
+  bottom: -12px;
+  left: 20px;
+  z-index: 0;
+  filter: blur(1.5px);
+}
+
+.tent-label {
+  margin-top: 0.5rem;
+  font-size: 1.08rem;
+  color: #7a4c1e;
+  text-shadow: 0 2px 8px #fff8e144;
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.02em;
+  text-align: center;
+  font-weight: 600;
+}
+/* Footer styles */
+.bazaar-footer {
+  width: 100vw;
+  background: rgba(255, 248, 225, 0.93);
+  color: #7a4c1e;
+  text-align: center;
+  padding: 1.2rem 0 1.1rem 0;
+  font-size: 1.08rem;
+  font-family: 'Marcellus', serif;
+  font-weight: 500;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 -2px 12px 0 rgba(80, 40, 10, 0.08);
+  margin-top: auto;
+  z-index: 5;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+}
+.bazaar-footer a {
+  color: #b8860b;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.18s;
+  font-weight: 600;
+}
+.bazaar-footer a:hover {
+  color: #7a4c1e;
+  text-decoration: underline;
+}
+.footer-sep {
+  color: #e09b3d;
+  font-weight: 700;
+  margin: 0 0.2rem;
+}
+
+/* Tent color themes */
+.tent-gold .tent-top, .tent-gold .tent-body {
+  background: linear-gradient(135deg, #ffd700 60%, #b8860b 100%);
+}
+.tent-gold.tent-featured .tent-top, .tent-gold.tent-featured .tent-body {
+  box-shadow: 0 0 24px 8px #ffe066, 0 12px 24px 0 rgba(0,0,0,0.13);
+  border: 2.5px solid #fffbe6;
+}
+.tent-gold.tent-featured {
+  animation: tent-glow 1.5s infinite alternate;
+}
+@keyframes tent-glow {
+  0% { filter: drop-shadow(0 0 0px #ffe066); }
+  100% { filter: drop-shadow(0 0 16px #ffe066); }
+}
+
+.tent-blue .tent-top, .tent-blue .tent-body {
+  background: linear-gradient(135deg, #1e3a8a 60%, #60a5fa 100%);
+}
+.tent-green .tent-top, .tent-green .tent-body {
+  background: linear-gradient(135deg, #047857 60%, #34d399 100%);
+}
+.tent-purple .tent-top, .tent-purple .tent-body {
+  background: linear-gradient(135deg, #6d28d9 60%, #c4b5fd 100%);
+}
+.tent-red .tent-top, .tent-red .tent-body {
+  background: linear-gradient(135deg, #b91c1c 60%, #f87171 100%);
+}
+.tent-orange .tent-top, .tent-orange .tent-body {
+  background: linear-gradient(135deg, #ea580c 60%, #fdba74 100%);
+}
+.tent-gray .tent-top, .tent-gray .tent-body {
+  background: linear-gradient(135deg, #374151 60%, #d1d5db 100%);
+}
+.tent-teal .tent-top, .tent-teal .tent-body {
+  background: linear-gradient(135deg, #0e7490 60%, #5eead4 100%);
+}
+
+@media (max-width: 900px) {
+  .bazaar-tent-card {
+    padding: 1.5rem 0.5rem 1.2rem 0.5rem;
+  }
+  .bazaar-tent-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1.2rem;
+  }
+  .tent-3d {
+    width: 90px;
+    height: 75px;
+  }
+  .tent-top {
+    width: 70px;
+    height: 28px;
+    left: 10px;
+  }
+  .tent-body {
+    width: 90px;
+    height: 45px;
+    top: 22px;
+  }
+  .tent-shadow {
+    width: 60px;
+    height: 12px;
+    left: 15px;
+    bottom: -8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bazaar-tent-card {
+    padding: 0.7rem 0.1rem 0.7rem 0.1rem;
+    margin: 1vw 0 2vw 0;
+  }
+  .bazaar-tent-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+    padding: 0.5rem 0.1rem;
+  }
+  .tent-label {
+    font-size: 0.98rem;
+  }
+  .bazaar-footer {
+    font-size: 0.98rem;
+    padding: 0.7rem 0 0.7rem 0;
+  }
+}

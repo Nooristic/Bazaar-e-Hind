@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bazaar-e-Hind - Manufacturer Community Forum</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bazaar-bg: #f5ebe3;
+      --primary: #b88c2b;
+      --accent: #e0c68c;
+      --border: #e0c68c;
+      --text: #3e2723;
+      --btn: #ffe7b3;
+      --btn-hover: #ffd180;
+    }
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: transparent;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: var(--bazaar-bg);
+      border-bottom: 2px solid var(--border);
+      padding: 18px 24px;
+      gap: 18px;
+    }
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover {
+      color: #a67c52;
+    }
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .forum-container {
+      flex: 1;
+      padding: 32px 32px 24px 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+    .posts-section {
+      flex: 2;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.05);
+      border: 1.5px solid var(--border);
+      padding: 18px 18px 10px 18px;
+      min-width: 320px;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .posts-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #6d4c1e;
+    }
+    .post-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .post-item {
+      background: #fffbe6;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: box-shadow 0.15s, border 0.15s;
+      box-shadow: 0 1px 6px rgba(180,140,60,0.06);
+      position: relative;
+    }
+    .post-item.active, .post-item:active {
+      box-shadow: 0 4px 16px rgba(180,140,60,0.13);
+      border-color: var(--primary);
+      background: #ffe7b3;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .post-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #3e2723;
+      flex: 1;
+      margin-right: 10px;
+    }
+    .post-type {
+      font-size: 0.95rem;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: #e0c68c;
+      color: #6d4c1e;
+      font-weight: 500;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+    .post-author {
+      font-size: 0.95rem;
+      color: #b88c2b;
+      margin-left: 10px;
+      font-style: italic;
+    }
+    .post-snippet {
+      margin: 8px 0 0 0;
+      color: #6d4c1e;
+      font-size: 1rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .post-replies {
+      position: absolute;
+      right: 18px;
+      bottom: 10px;
+      font-size: 0.95rem;
+      color: #b88c2b;
+      background: #fff;
+      border-radius: 8px;
+      padding: 2px 10px;
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(180,140,60,0.04);
+    }
+    .post-content-full {
+      margin-top: 10px;
+      color: #3e2723;
+      font-size: 1rem;
+      display: none;
+      white-space: pre-line;
+    }
+    .post-item.active .post-content-full {
+      display: block;
+    }
+    .post-item.active .post-snippet {
+      display: none;
+    }
+    .forum-form-section {
+      flex: 1.2;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.05);
+      border: 1.5px solid var(--border);
+      padding: 18px 18px 18px 18px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #6d4c1e;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: #3e2723;
+    }
+    .form-group input[type="text"],
+    .form-group textarea,
+    .form-group select {
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      font-size: 1rem;
+      background: #fffbe6;
+      color: #3e2723;
+      resize: none;
+    }
+    .form-group textarea {
+      min-height: 60px;
+      max-width: 100%;
+    }
+    .submit-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 10px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 18px 0 0 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.08);
+      transition: background 0.15s;
+    }
+    .submit-btn:hover {
+      background: #a67c52;
+    }
+    footer {
+      background: #fffbe6;
+      border-top: 2px solid var(--border);
+      padding: 16px 0 12px 0;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: auto;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: #6d4c1e;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+    @media (max-width: 1050px) {
+      .forum-container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 18px 2vw 18px 2vw;
+      }
+      .posts-section, .forum-form-section {
+        min-width: 0;
+      }
+    }
+    @media (max-width: 700px) {
+      .forum-container {
+        padding: 10px 2vw 10px 2vw;
+      }
+      .posts-section, .forum-form-section {
+        padding: 12px 6px 12px 6px;
+      }
+      .form-group input[type="text"], .form-group textarea, .form-group select {
+        font-size: 0.98rem;
+      }
+      .post-title {
+        font-size: 1rem;
+      }
+      .post-snippet, .post-content-full {
+        font-size: 0.97rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <header>
+    <a href="bazaar-homepage.html" class="back-link" title="Back to Home">&#8592; Home</a>
+    <span class="header-title">Community Forum</span>
+  </header>
+  <main class="forum-container">
+    <section class="posts-section">
+      <div class="posts-title">Browse Posts</div>
+      <div class="post-list" id="postList">
+        <!-- Example Post 1 -->
+        <div class="post-item" onclick="togglePost(this)">
+          <div class="post-header">
+            <span class="post-title">How to source premium silk?</span>
+            <span class="post-type">Discussion</span>
+            <span class="post-author">by Aman</span>
+          </div>
+          <div class="post-snippet">Looking for reliable suppliers for premium silk rolls. Any recommendations?</div>
+          <div class="post-content-full">Looking for reliable suppliers for premium silk rolls. Any recommendations? Please share your experience and contacts if possible.</div>
+          <span class="post-replies">5 Replies</span>
+        </div>
+        <!-- Example Post 2 -->
+        <div class="post-item" onclick="togglePost(this)">
+          <div class="post-header">
+            <span class="post-title">Upcoming Textile Expo 2025</span>
+            <span class="post-type">Event</span>
+            <span class="post-author">by Priya</span>
+          </div>
+          <div class="post-snippet">Join us at the Textile Expo in Surat this March. Details inside.</div>
+          <div class="post-content-full">Join us at the Textile Expo in Surat this March. Details inside. Let's connect and collaborate at the event!</div>
+          <span class="post-replies">2 Replies</span>
+        </div>
+        <!-- Example Post 3 -->
+        <div class="post-item" onclick="togglePost(this)">
+          <div class="post-header">
+            <span class="post-title">Blog: The Art of Handloom</span>
+            <span class="post-type">Blog</span>
+            <span class="post-author">by Kavita</span>
+          </div>
+          <div class="post-snippet">Discover the intricate process and heritage of Indian handloom weaving.</div>
+          <div class="post-content-full">Discover the intricate process and heritage of Indian handloom weaving. From raw material to finished fabric, learn the story behind every thread.</div>
+          <span class="post-replies">8 Replies</span>
+        </div>
+      </div>
+    </section>
+    <form class="forum-form-section" id="postForm" onsubmit="addPost(event)">
+      <div class="form-title">Create New Post</div>
+      <div class="form-group">
+        <label for="authorName">Author Name</label>
+        <input type="text" id="authorName" required maxlength="40">
+      </div>
+      <div class="form-group">
+        <label for="postTitle">Title</label>
+        <input type="text" id="postTitle" required maxlength="80">
+      </div>
+      <div class="form-group">
+        <label for="postContent">Content</label>
+        <textarea id="postContent" required maxlength="500"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="postType">Type</label>
+        <select id="postType" required>
+          <option value="Discussion">Discussion</option>
+          <option value="Blog">Blog</option>
+          <option value="Event">Event</option>
+        </select>
+      </div>
+      <button class="submit-btn" type="submit">
+        Submit &#8377;
+      </button>
+    </form>
+  </main>
+  <footer>
+    <div class="footer-links">
+      <a href="#">FAQs</a>
+      <a href="#">Terms &amp; Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </footer>
+  <script>
+    // Collapsible posts
+    function togglePost(postDiv) {
+      // Collapse all others
+      document.querySelectorAll('.post-item').forEach(function(item) {
+        if (item !== postDiv) item.classList.remove('active');
+      });
+      // Toggle this one
+      postDiv.classList.toggle('active');
+    }
+
+    // Add new post
+    function addPost(e) {
+      e.preventDefault();
+      var author = document.getElementById('authorName').value.trim();
+      var title = document.getElementById('postTitle').value.trim();
+      var content = document.getElementById('postContent').value.trim();
+      var type = document.getElementById('postType').value;
+      if (!author || !title || !content) return;
+
+      var postList = document.getElementById('postList');
+      var postDiv = document.createElement('div');
+      postDiv.className = 'post-item';
+      postDiv.setAttribute('onclick', 'togglePost(this)');
+      postDiv.innerHTML = `
+        <div class="post-header">
+          <span class="post-title">${escapeHtml(title)}</span>
+          <span class="post-type">${escapeHtml(type)}</span>
+          <span class="post-author">by ${escapeHtml(author)}</span>
+        </div>
+        <div class="post-snippet">${escapeHtml(content.length > 60 ? content.substring(0, 60) + '...' : content)}</div>
+        <div class="post-content-full">${escapeHtml(content)}</div>
+        <span class="post-replies">0 Replies</span>
+      `;
+      postList.insertBefore(postDiv, postList.firstChild);
+      document.getElementById('postForm').reset();
+    }
+
+    // Simple HTML escape
+    function escapeHtml(text) {
+      var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+  </script>
+</body>
+</html>

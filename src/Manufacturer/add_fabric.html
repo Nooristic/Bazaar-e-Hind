@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bazaar-e-Hind - Add Fabric</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bazaar-bg: #f5ebe3;
+      --primary: #b88c2b;
+      --accent: #e0c68c;
+      --border: #e0c68c;
+      --text: #3e2723;
+      --btn: #ffe7b3;
+      --btn-hover: #ffd180;
+    }
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: transparent;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: var(--bazaar-bg);
+      border-bottom: 2px solid var(--border);
+      padding: 18px 24px;
+      gap: 18px;
+    }
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover {
+      color: #a67c52;
+    }
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .bazaar-add-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 8px 24px 8px;
+    }
+    .bazaar-modal {
+      background: linear-gradient(135deg, #fffbe6 80%, #ffe7b3 100%);
+      border-radius: 22px;
+      box-shadow: 0 8px 40px 0 rgba(180,140,60,0.18), 0 0 0 8px #e0c68c33;
+      max-width: 98vw;
+      width: 420px;
+      border: 3px solid #b88c2b;
+      overflow: hidden;
+      animation: bazaar-fadein 0.5s;
+    }
+    @keyframes bazaar-fadein {
+      from { opacity: 0; transform: scale(0.95);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .bazaar-modal-header {
+      background: linear-gradient(90deg, #ffe7b3 60%, #fffbe6 100%);
+      padding: 18px 28px 10px 28px;
+      font-size: 1.35rem;
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      color: #b88c2b;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #e0c68c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .bazaar-modal-body {
+      padding: 20px 28px 24px 28px;
+      background: transparent;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .bazaar-form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .bazaar-form-group label {
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #6d4c1e;
+      font-size: 1.05rem;
+    }
+    .bazaar-form-group input[type="text"],
+    .bazaar-form-group input[type="number"],
+    .bazaar-form-group textarea,
+    .bazaar-form-group select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #e0c68c;
+      font-size: 1rem;
+      background: #fffbe6;
+      color: #3e2723;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .bazaar-form-group input[type="text"]:focus,
+    .bazaar-form-group input[type="number"]:focus,
+    .bazaar-form-group textarea:focus,
+    .bazaar-form-group select:focus {
+      border-color: #b88c2b;
+    }
+    .bazaar-form-group textarea {
+      min-height: 48px;
+      resize: vertical;
+    }
+    .bazaar-form-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .bazaar-form-group .color-options-list input {
+      margin-bottom: 6px;
+    }
+    .bazaar-form-group .color-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .bazaar-form-group .bazaar-img-preview {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .bazaar-form-group .bazaar-img-preview img {
+      width: 54px;
+      height: 54px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #e0c68c;
+      background: #fffbe6;
+    }
+    .bazaar-form-group .bazaar-img-preview .bazaar-img-placeholder {
+      width: 54px;
+      height: 54px;
+      border-radius: 8px;
+      background: #fffbe6;
+      border: 2px dashed #e0c68c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b88c2b;
+      font-size: 2rem;
+    }
+    .bazaar-pricing-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .bazaar-pricing-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .bazaar-pricing-row input[type="number"] {
+      width: 80px;
+    }
+    .bazaar-pricing-row input[type="text"] {
+      width: 100px;
+      padding-left: 28px;
+      background-repeat: no-repeat;
+      background-position: 8px 50%;
+      background-size: 16px 16px;
+    }
+    .bazaar-pricing-row .bazaar-remove-row {
+      background: none;
+      border: none;
+      color: #b71c1c;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: 4px;
+      margin-top: 2px;
+    }
+    .bazaar-add-row-btn {
+      background: #ffe7b3;
+      color: #b88c2b;
+      border: 1.5px solid #e0c68c;
+      border-radius: 8px;
+      padding: 5px 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 0.15s, border 0.15s;
+    }
+    .bazaar-add-row-btn:hover {
+      background: #ffd180;
+      border-color: #b88c2b;
+    }
+    .bazaar-modal-footer {
+      padding: 18px 28px 22px 28px;
+      background: linear-gradient(90deg, #ffe7b3 60%, #fffbe6 100%);
+      border-top: 2px solid #e0c68c;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .bazaar-add-btn {
+      background: linear-gradient(90deg, #ffd700 60%, #ffe066 100%);
+      color: #6d4c1e;
+      border: none;
+      border-radius: 22px;
+      padding: 12px 34px 12px 28px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.08);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+    .bazaar-add-btn .coin {
+      font-size: 1.4rem;
+      color: #ffd700;
+      filter: drop-shadow(0 0 2px #b88c2b);
+      margin-left: 2px;
+    }
+    .bazaar-add-btn:hover {
+      background: linear-gradient(90deg, #ffe066 60%, #ffd700 100%);
+      box-shadow: 0 4px 18px #ffd70044;
+    }
+    .bazaar-add-btn::after {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 60% 40%, #fffbe6 0%, #ffd70044 60%, transparent 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .bazaar-add-btn:hover::after {
+      opacity: 1;
+      animation: bazaar-shine 0.7s linear;
+    }
+    @keyframes bazaar-shine {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .bazaar-success-msg {
+      color: #256029;
+      background: #e6ffe6;
+      border: 1.5px solid #b8e6b8;
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 18px 0 0 0;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      animation: bazaar-fadein 0.5s;
+    }
+    @media (max-width: 600px) {
+      .bazaar-modal { width: 98vw; min-width: 0; }
+      .bazaar-modal-header, .bazaar-modal-footer, .bazaar-modal-body { padding-left: 10px; padding-right: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <header>
+    <a href="prod_manufacturer.html" class="back-link" title="Back to Home">&#8592; Home</a>
+    <span class="header-title">Add New Fabric</span>
+  </header>
+  <main class="bazaar-add-container">
+    <div class="bazaar-modal" style="margin:0;">
+      <div class="bazaar-modal-header">
+        Add New Fabric
+      </div>
+      <form id="bazaarFabricForm" autocomplete="off" onsubmit="return submitBazaarFabric(event)">
+        <div class="bazaar-modal-body">
+          <div class="bazaar-form-group">
+            <label for="fabricName">Name *</label>
+            <input type="text" id="fabricName" required maxlength="40">
+          </div>
+          <div class="bazaar-form-group">
+            <label for="fabricDesc">Description *</label>
+            <textarea id="fabricDesc" required maxlength="200"></textarea>
+          </div>
+          <div class="bazaar-form-group">
+            <label for="fabricComp">Composition</label>
+            <input type="text" id="fabricComp" placeholder="e.g., Cotton 80%, Polyester 20%">
+          </div>
+          <div class="bazaar-form-row">
+            <div class="bazaar-form-group" style="flex:1;">
+              <label for="fabricGSM">GSM *</label>
+              <input type="number" id="fabricGSM" required min="1" max="2000" placeholder="e.g., 120">
+            </div>
+            <div class="bazaar-form-group" style="flex:1;">
+              <label for="fabricMOQ">MOQ *</label>
+              <input type="number" id="fabricMOQ" required min="1" max="100000" placeholder="e.g., 100">
+            </div>
+          </div>
+          <div class="bazaar-form-group">
+            <label for="fabricColors">Color Options</label>
+            <textarea id="fabricColors" placeholder="e.g., Red, Blue, Green"></textarea>
+          </div>
+          <div class="bazaar-form-group">
+            <label for="fabricImages">Images</label>
+            <input type="file" id="fabricImages" accept="image/*" multiple onchange="bazaarPreviewImages(event)">
+            <div class="bazaar-img-preview" id="bazaarImgPreview">
+              <div class="bazaar-img-placeholder">&#128247;</div>
+            </div>
+          </div>
+          <div class="bazaar-form-group">
+            <label for="fabricVisibility">Visibility Type *</label>
+            <select id="fabricVisibility" required>
+              <option value="">Select</option>
+              <option value="public">Public</option>
+              <option value="restricted">Restricted</option>
+            </select>
+          </div>
+          <div class="bazaar-form-group">
+            <label>Pricing *</label>
+            <div class="bazaar-pricing-table" id="bazaarPricingTable">
+              <!-- Pricing rows will be inserted here -->
+            </div>
+            <button type="button" class="bazaar-add-row-btn" onclick="bazaarAddPricingRow()">+ Add More</button>
+          </div>
+        </div>
+        <div class="bazaar-modal-footer">
+          <button type="submit" class="bazaar-add-btn">
+            Add Fabric
+            <span class="coin">&#8377;</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <div id="bazaarSuccessMsg" class="bazaar-success-msg" style="display:none;">
+    Fabric added successfully!
+  </div>
+  <footer>
+    <div class="footer-links">
+      <a href="#">FAQs</a>
+      <a href="#">Terms &amp; Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </footer>
+  <script>
+    // Pricing rows logic
+    function bazaarInitPricingRows() {
+      const table = document.getElementById('bazaarPricingTable');
+      table.innerHTML = '';
+      bazaarAddPricingRow();
+      bazaarAddPricingRow();
+    }
+    function bazaarAddPricingRow() {
+      const table = document.getElementById('bazaarPricingTable');
+      const row = document.createElement('div');
+      row.className = 'bazaar-pricing-row';
+      row.innerHTML = `
+        <input type="number" min="1" required placeholder="Min Qty" style="width:80px;">
+        <div style="position:relative;flex:1;">
+          <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#b88c2b;font-size:1.1rem;">&#8377;</span>
+          <input type="number" min="1" required placeholder="Price" style="padding-left:28px;width:100px;">
+        </div>
+        <button type="button" class="bazaar-remove-row" title="Remove" onclick="bazaarRemovePricingRow(this)">&times;</button>
+      `;
+      table.appendChild(row);
+      bazaarUpdateRemoveBtns();
+    }
+    function bazaarRemovePricingRow(btn) {
+      const table = document.getElementById('bazaarPricingTable');
+      if (table.children.length > 2) {
+        btn.parentElement.remove();
+        bazaarUpdateRemoveBtns();
+      }
+    }
+    function bazaarUpdateRemoveBtns() {
+      const table = document.getElementById('bazaarPricingTable');
+      Array.from(table.querySelectorAll('.bazaar-remove-row')).forEach((btn, idx, arr) => {
+        btn.style.display = (arr.length > 2) ? 'inline' : 'none';
+      });
+    }
+    // Image preview logic
+    function bazaarPreviewImages(e) {
+      const files = e.target.files;
+      const preview = document.getElementById('bazaarImgPreview');
+      preview.innerHTML = '';
+      if (!files.length) {
+        preview.innerHTML = '<div class="bazaar-img-placeholder">&#128247;</div>';
+        return;
+      }
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    // Form submission and validation
+    function submitBazaarFabric(e) {
+      e.preventDefault();
+      // Validate required fields
+      const name = document.getElementById('fabricName').value.trim();
+      const desc = document.getElementById('fabricDesc').value.trim();
+      const gsm = document.getElementById('fabricGSM').value.trim();
+      const moq = document.getElementById('fabricMOQ').value.trim();
+      const vis = document.getElementById('fabricVisibility').value;
+      let valid = !!(name && desc && gsm && moq && vis);
+      // Validate pricing rows
+      const pricingRows = document.querySelectorAll('.bazaar-pricing-row');
+      let pricingValid = true;
+      pricingRows.forEach(row => {
+        const qty = row.querySelector('input[type="number"]:first-child').value;
+        const price = row.querySelector('input[type="number"]:nth-child(2)').value;
+        if (!qty || !price) pricingValid = false;
+      });
+      if (!pricingValid) valid = false;
+      if (!valid) {
+        alert("Please fill all required fields and pricing tiers.");
+        return false;
+      }
+      // Success
+      document.getElementById('bazaarSuccessMsg').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('bazaarSuccessMsg').style.display = 'none';
+        window.location.href = "prod_manufacturer.html";
+      }, 1800);
+      document.getElementById('bazaarFabricForm').reset();
+      bazaarInitPricingRows();
+      document.getElementById('bazaarImgPreview').innerHTML = '<div class="bazaar-img-placeholder">&#128247;</div>';
+      return false;
+    }
+    // Initialize on load
+    window.onload = function() {
+      bazaarInitPricingRows();
+    };
+  </script>
+</body>
+</html>

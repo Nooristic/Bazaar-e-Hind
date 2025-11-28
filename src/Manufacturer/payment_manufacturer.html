@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bazaar-e-Hind - Manufacturer Payment Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bazaar-bg: #f5ebe3;
+      --primary: #b88c2b;
+      --accent: #e0c68c;
+      --border: #e0c68c;
+      --text: #3e2723;
+      --btn: #ffe7b3;
+      --btn-hover: #ffd180;
+    }
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: transparent;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: var(--bazaar-bg);
+      border-bottom: 2px solid var(--border);
+      padding: 18px 24px;
+      gap: 18px;
+    }
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover {
+      color: #a67c52;
+    }
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .payment-container {
+      flex: 1;
+      padding: 32px 32px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-width: 0;
+      gap: 24px;
+    }
+    .responsive-table {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    .table-row, .table-header {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.05);
+      border: 1.5px solid var(--border);
+      padding: 0;
+      min-width: 800px;
+    }
+    .table-header {
+      background: #fffbe6;
+      font-weight: bold;
+      color: #6d4c1e;
+      font-size: 1.05rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .table-cell {
+      flex: 1 1 0;
+      padding: 14px 10px;
+      display: flex;
+      align-items: center;
+      min-width: 110px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+    .table-cell.actions {
+      flex: 0 0 180px;
+      justify-content: center;
+    }
+    .status {
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: #ffe7b3;
+      color: #6d4c1e;
+      display: inline-block;
+      font-size: 0.98rem;
+    }
+    .status.completed { background: #c8e6c9; color: #256029; }
+    .status.pending { background: #ffe7b3; color: #b88c2b; }
+    .status.failed { background: #ffcdd2; color: #b71c1c; }
+    .generate-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 8px 18px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.08);
+      transition: background 0.15s;
+    }
+    .generate-btn:hover {
+      background: #a67c52;
+    }
+    .receipt-message {
+      color: #256029;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    footer {
+      background: #fffbe6;
+      border-top: 2px solid var(--border);
+      padding: 16px 0 12px 0;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: auto;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: #6d4c1e;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+    @media (max-width: 900px) {
+      .payment-container {
+        padding: 18px 2vw 18px 2vw;
+      }
+      .table-row, .table-header {
+        min-width: 500px;
+      }
+    }
+    @media (max-width: 600px) {
+      .payment-container {
+        padding: 10px 2vw 10px 2vw;
+      }
+      .table-row, .table-header {
+        flex-direction: column;
+        min-width: 0;
+        border-radius: 10px;
+        margin-bottom: 8px;
+      }
+      .table-cell {
+        padding: 10px 8px;
+        min-width: 0;
+        border-bottom: 1px solid #f5ebe3;
+      }
+      .table-header .table-cell {
+        border-bottom: none;
+      }
+      .table-cell:last-child {
+        border-bottom: none;
+      }
+      .table-cell.actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <header>
+    <a href="bazaar-homepage.html" class="back-link" title="Back to Home">&#8592; Home</a>
+    <span class="header-title">Payment Management</span>
+  </header>
+  <main class="payment-container">
+    <div id="receiptMsg" class="receipt-message"></div>
+    <div class="responsive-table">
+      <div class="table-header">
+        <div class="table-cell">Order ID</div>
+        <div class="table-cell">Amount</div>
+        <div class="table-cell">Method</div>
+        <div class="table-cell">Status</div>
+        <div class="table-cell">Date</div>
+        <div class="table-cell actions">Actions</div>
+      </div>
+      <div class="table-row">
+        <div class="table-cell">1001</div>
+        <div class="table-cell">₹12,000</div>
+        <div class="table-cell">UPI</div>
+        <div class="table-cell"><span class="status completed">Completed</span></div>
+        <div class="table-cell">2025-03-10</div>
+        <div class="table-cell actions">
+          <button class="generate-btn" onclick="generateReceipt('1001', '₹12,000')">Generate Receipt &#8377;</button>
+        </div>
+      </div>
+      <div class="table-row">
+        <div class="table-cell">1002</div>
+        <div class="table-cell">₹5,000</div>
+        <div class="table-cell">Bank Transfer</div>
+        <div class="table-cell"><span class="status pending">Pending</span></div>
+        <div class="table-cell">2025-03-12</div>
+        <div class="table-cell actions">
+          <button class="generate-btn" onclick="generateReceipt('1002', '₹5,000')">Generate Receipt &#8377;</button>
+        </div>
+      </div>
+      <div class="table-row">
+        <div class="table-cell">1003</div>
+        <div class="table-cell">₹7,500</div>
+        <div class="table-cell">Credit Card</div>
+        <div class="table-cell"><span class="status completed">Completed</span></div>
+        <div class="table-cell">2025-03-15</div>
+        <div class="table-cell actions">
+          <button class="generate-btn" onclick="generateReceipt('1003', '₹7,500')">Generate Receipt &#8377;</button>
+        </div>
+      </div>
+      <div class="table-row">
+        <div class="table-cell">1004</div>
+        <div class="table-cell">₹2,500</div>
+        <div class="table-cell">UPI</div>
+        <div class="table-cell"><span class="status failed">Failed</span></div>
+        <div class="table-cell">2025-03-18</div>
+        <div class="table-cell actions">
+          <button class="generate-btn" onclick="generateReceipt('1004', '₹2,500')">Generate Receipt &#8377;</button>
+        </div>
+      </div>
+      <div class="table-row">
+        <div class="table-cell">1005</div>
+        <div class="table-cell">₹12,000</div>
+        <div class="table-cell">UPI</div>
+        <div class="table-cell"><span class="status pending">Pending</span></div>
+        <div class="table-cell">2025-03-20</div>
+        <div class="table-cell actions">
+          <button class="generate-btn" onclick="generateReceipt('1005', '₹12,000')">Generate Receipt &#8377;</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="footer-links">
+      <a href="#">FAQs</a>
+      <a href="#">Terms &amp; Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </footer>
+  <script>
+    function generateReceipt(orderId, amount) {
+      var msg = document.getElementById('receiptMsg');
+      msg.textContent = "Receipt generated for Order #" + orderId + " (" + amount + ")";
+      setTimeout(function(){ msg.textContent = ""; }, 4000);
+    }
+  </script>
+</body>
+</html>

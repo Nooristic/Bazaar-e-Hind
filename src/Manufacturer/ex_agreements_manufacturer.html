@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bazaar-e-Hind - Manufacturer Exclusivity Agreements</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bazaar-bg: #f5ebe3;
+      --primary: #b88c2b;
+      --accent: #e0c68c;
+      --border: #e0c68c;
+      --text: #3e2723;
+      --btn: #ffe7b3;
+      --btn-hover: #ffd180;
+    }
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background:transparent;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: var(--bazaar-bg);
+      border-bottom: 2px solid var(--border);
+      padding: 18px 24px;
+      gap: 18px;
+    }
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .back-link:hover {
+      color: #a67c52;
+    }
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .agreements-container {
+      flex: 1;
+      padding: 32px 32px 24px 32px;
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+    .agreements-list {
+      flex: 2;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.05);
+      border: 1.5px solid var(--border);
+      padding: 18px 18px 10px 18px;
+      min-width: 320px;
+      overflow-x: auto;
+    }
+    .agreements-list-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #6d4c1e;
+    }
+    .agreements-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      font-size: 1rem;
+    }
+    .agreements-table th, .agreements-table td {
+      padding: 10px 8px;
+      text-align: left;
+    }
+    .agreements-table th {
+      background: #fffbe6;
+      color: #6d4c1e;
+      font-weight: bold;
+      border-bottom: 2px solid var(--border);
+    }
+    .agreements-table td {
+      background: #fff;
+      border-bottom: 1px solid #f5ebe3;
+      border-radius: 6px;
+    }
+    .agreements-table tr:last-child td {
+      border-bottom: none;
+    }
+    .status {
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: #ffe7b3;
+      color: #6d4c1e;
+      display: inline-block;
+      font-size: 0.98rem;
+    }
+    .status.active { background: #c8e6c9; color: #256029; }
+    .status.pending { background: #ffe7b3; color: #b88c2b; }
+    .status.expired { background: #ffcdd2; color: #b71c1c; }
+    .agreement-form {
+      flex: 1.2;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.05);
+      border: 1.5px solid var(--border);
+      padding: 18px 18px 18px 18px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #6d4c1e;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: #3e2723;
+    }
+    .form-group select,
+    .form-group textarea,
+    .form-group input[type="date"] {
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: 1.5px solid var(--border);
+      font-size: 1rem;
+      background: #fffbe6;
+      color: #3e2723;
+      resize: none;
+    }
+    .form-group textarea {
+      min-height: 60px;
+      max-width: 100%;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .submit-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 10px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 18px 0 0 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(180,140,60,0.08);
+      transition: background 0.15s;
+    }
+    .submit-btn:hover {
+      background: #a67c52;
+    }
+    footer {
+      background: #fffbe6;
+      border-top: 2px solid var(--border);
+      padding: 16px 0 12px 0;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: auto;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: #6d4c1e;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+    @media (max-width: 1050px) {
+      .agreements-container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 18px 2vw 18px 2vw;
+      }
+      .agreements-list, .agreement-form {
+        min-width: 0;
+      }
+    }
+    @media (max-width: 700px) {
+      .agreements-container {
+        padding: 10px 2vw 10px 2vw;
+      }
+      .agreements-list, .agreement-form {
+        padding: 12px 6px 12px 6px;
+      }
+      .agreements-table th, .agreements-table td {
+        padding: 8px 4px;
+        font-size: 0.98rem;
+      }
+      .form-row {
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <header>
+    <a href="bazaar-homepage.html" class="back-link" title="Back to Home">&#8592; Home</a>
+    <span class="header-title">Exclusivity Agreements</span>
+  </header>
+  <main class="agreements-container">
+    <section class="agreements-list">
+      <div class="agreements-list-title">Existing Agreements</div>
+      <table class="agreements-table">
+        <thead>
+          <tr>
+            <th>Wholesaler</th>
+            <th>Fabrics</th>
+            <th>Duration</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Arya Textiles</td>
+            <td>Silk Saffron, Cotton Blue</td>
+            <td>01/05/2024 - 01/05/2025</td>
+            <td><span class="status active">Active</span></td>
+          </tr>
+          <tr>
+            <td>Raj Wholesalers</td>
+            <td>Linen Gold</td>
+            <td>15/03/2024 - 15/09/2024</td>
+            <td><span class="status pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td>OKC Creation</td>
+            <td>Velvet Red</td>
+            <td>01/01/2023 - 31/12/2023</td>
+            <td><span class="status expired">Expired</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <form class="agreement-form">
+      <div class="form-title">Create New Agreement</div>
+      <div class="form-group">
+        <label for="wholesaler">Select Wholesaler</label>
+        <select id="wholesaler" required>
+          <option value="">-- Select --</option>
+          <option>Arya Textiles</option>
+          <option>Raj Wholesalers</option>
+          <option>OKC Creation</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fabrics">Select Fabrics</label>
+        <select id="fabrics" multiple size="3" required>
+          <option>Silk Saffron</option>
+          <option>Cotton Blue</option>
+          <option>Linen Gold</option>
+          <option>Velvet Red</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="terms">Define Terms</label>
+        <textarea id="terms" placeholder="Enter agreement terms..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Duration</label>
+        <div class="form-row">
+          <input type="date" required>
+          <span style="margin: 0 6px;">to</span>
+          <input type="date" required>
+        </div>
+      </div>
+      <button class="submit-btn" type="submit">
+        Submit Agreement &#8377;
+      </button>
+    </form>
+  </main>
+  <footer>
+    <div class="footer-links">
+      <a href="#">FAQs</a>
+      <a href="#">Terms &amp; Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </footer>
+</body>
+</html>
