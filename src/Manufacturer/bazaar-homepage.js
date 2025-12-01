@@ -5,7 +5,7 @@ const tents = [
     desc: "Browse catalog, manage inventory & fabrics",
     img: "../../assests/tent-catalog.jpg",
     icon: "📦",
-    link: "prod_manufacturer.html"
+    link: "prod_manufacturer.php"
   },
   {
     key: "order",
