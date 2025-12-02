@@ -69,7 +69,7 @@ $mysqli->close();
   </video>
 
   <div class="header">
-    <a href="../bazaar-homepage.php" class="back-link">← Home</a>
+    <a href="bazaar-homepage.php" class="back-link">← Home</a>
     <span class="header-title">Product/Fabric Management</span>
     <div class="profile-btn">Profile Icon</div>
   </div>
@@ -90,18 +90,17 @@ $mysqli->close();
       </div>
     <?php else: ?>
       <?php foreach ($fabrics as $f):
-          $images = json_decode($f['image_urls'] ?? '[]', true);
-          $first = !empty($images) ? '../../uploads/' . basename($images[0]) : '../../assests/placeholder.jpg';
-          $desc = strlen($f['description']) > 70 ? substr($f['description'],0,70).'...' : $f['description'];
-          $status_class = $f['status']==='approved' ? 'approved' : ($f['status']==='rejected' ? 'rejected' : 'pending');
-      ?>
-        <div class="product-card">
-          <div class="product-img"><img src="<?= $first ?>" alt="<?= htmlspecialchars($f['name']) ?>"></div>
-          <div class="product-title"><?= htmlspecialchars($f['name']) ?></div>
-          <div class="product-desc"><?= htmlspecialchars($desc) ?></div>
-          <div class="status <?= $status_class ?>"><?= ucwords(str_replace('_',' ',$f['status'])) ?></div>
-        </div>
-      <?php endforeach; ?>
+    $images = json_decode($f['image_urls'] ?? '[]', true);
+    $first = !empty($images) ? '../uploads/' . basename($images[0]) : '../assests/no-image.jpg';    $desc = strlen($f['description']) > 70 ? substr($f['description'],0,70).'...' : $f['description'];
+    $status_class = $f['status']==='approved' ? 'approved' : ($f['status']==='rejected' ? 'rejected' : 'pending');
+?>
+    <div class="product-card">
+      <div class="product-img"><img src="<?= $first ?>" alt="<?= htmlspecialchars($f['name']) ?>"></div>
+      <div class="product-title"><?= htmlspecialchars($f['name']) ?></div>
+      <div class="product-desc"><?= htmlspecialchars($desc) ?></div>
+      <div class="status <?= $status_class ?>"><?= ucwords(str_replace('_',' ',$f['status'])) ?></div>
+    </div>
+<?php endforeach; ?>
     <?php endif; ?>
   </div>
 

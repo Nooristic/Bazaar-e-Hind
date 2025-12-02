@@ -13,7 +13,7 @@ const tents = [
     desc: "Track and manage your orders",
     img: "../../assests/tent-orders.jpg",
     icon: "🛒",
-    link: "order_manufacturer.html"
+    link: "order_manufacturer.php"
   },
   {
     key: "chat",
@@ -29,7 +29,7 @@ const tents = [
     desc: "Request and manage product samples",
     img: "../../assests/tent-samples.jpg",
     icon: "📑",
-    link: "sample_manufacturer.html"
+    link: "sample_manufacturer.php"
   },
   {
     key: "exclusive",
