@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings - Bazaar-e-Hind</title>
+  <link rel="stylesheet" href="bazaar-homepage.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Consistent styling with other pages */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Marcellus', serif;
+      background: #1a0a03;
+      color: #333;
+    }
+    .bazaar-content {
+      min-height: 100vh;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('silk-bg.jpg') center/cover no-repeat fixed;
+    }
+    .page-header {
+      background: rgba(212, 175, 55, 0.15);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      color: #d4af37;
+      font-size: 1.1rem;
+    }
+    .back-btn {
+      color: #d4af37;
+      text-decoration: none;
+      margin-right: 15px;
+      font-size: 1.4rem;
+    }
+    .page-title {
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin: 0;
+    }
+    .settings-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: rgba(255, 248, 240, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2);
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #d4af37, #b8972e);
+      color: #1a0a03;
+      padding: 18px 25px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .card-body {
+      padding: 30px 35px;
+    }
+    .form-group {
+      margin-bottom: 22px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #5d4037;
+    }
+    input[type="text"], input[type="email"], input[type="password"], textarea, select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #d4af37;
+      border-radius: 10px;
+      background: #fff8f0;
+      font-family: 'Marcellus', serif;
+      font-size: 1rem;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #d4af37, #b8972e);
+      color: #1a0a03;
+      border: none;
+      padding: 14px 32px;
+      font-family: 'Marcellus', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #e6c84a, #ccaa3a);
+      transform: translateY(-2px);
+    }
+    .logout-btn {
+      background: #8b4513;
+      margin-left: 15px;
+    }
+    .logout-btn:hover {
+      background: #a0522d;
+    }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: #d4af37;
+      font-size: 0.95rem;
+    }
+    .footer a {
+      color: #d4af37;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="bazaar-content">
+
+    <!-- Header -->
+    <header class="page-header">
+      <a href="bazaar-homepage.php" class="back-btn">Back</a>
+      <h1 class="page-title">Settings</h1>
+    </header>
+
+    <div class="settings-container">
+
+      <!-- Manage Account Card -->
+      <div class="card">
+        <div class="card-header">Manage Account</div>
+        <div class="card-body">
+          <form action="update-profile.php" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>Company Name</label>
+              <input type="text" name="company_name" value="Raj Traders" required />
+            </div>
+            <div class="form-group">
+              <label>Contact Person</label>
+              <input type="text" name="contact_person" value="Rajesh Patel" required />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="email" value="raj@rajtraders.com" required />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" name="phone" value="+91 98250 12345" required />
+            </div>
+            <div class="form-group">
+              <label>GST Number</label>
+              <input type="text" name="gst" value="24ABCDE1234F1Z5" required />
+            </div>
+            <div class="form-group">
+              <label>Change Password (leave blank to keep current)</label>
+              <input type="password" name="new_password" placeholder="New password" />
+            </div>
+            <div class="form-group">
+              <label>Company Logo</label>
+              <input type="file" name="logo" accept="image/*" />
+              <small>Current logo: rajtraders-logo.png</small>
+            </div>
+
+            <button type="submit" class="btn-submit">
+              Save Changes
+            </button>
+            <a href="logout.php">
+              <button type="button" class="btn-submit logout-btn">
+                Logout
+              </button>
+            </a>
+          </form>
+        </div>
+      </div>
+
+      <!-- Help Center Card -->
+      <div class="card">
+        <div class="card-header">Help Center</div>
+        <div class="card-body">
+          <p>Need help? We're here for you 24×7.</p>
+          <div style="margin: 20px 0;">
+            <a href="mailto:support@bazaarehind.com" style="color:#b8972e; font-weight:600;">
+              support@bazaarehind.com
+            </a><br><br>
+            <a href="tel:+919876543210" style="color:#b8972e; font-weight:600;">
+              +91 98765 43210
+            </a>
+          </div>
+          <a href="help-center.php">
+            <button class="btn-submit">Go to Help Center</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Policy Links -->
+      <div class="card">
+        <div class="card-header">Legal & Policies</div>
+        <div class="card-body" style="text-align:center; padding:40px;">
+          <a href="faqs.php">FAQs</a> • 
+          <a href="terms.php">Terms & Conditions</a> • 
+          <a href="privacy.php">Privacy Policy</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>
+        <a href="faqs.php">FAQs</a>
+        <span class="footer-sep">|</span>
+        <a href="terms.php">Terms & Conditions</a>
+        <span class="footer-sep">|</span>
+        <a href="privacy.php">Privacy Policy</a>
+      </div>
+      <p style="margin-top:15px; opacity:0.8;">© 2025 Bazaar-e-Hind. All rights reserved.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

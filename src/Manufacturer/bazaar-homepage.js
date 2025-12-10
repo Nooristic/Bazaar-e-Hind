@@ -45,7 +45,7 @@ const tents = [
     desc: "Join discussions and share insights",
     img: "../../assests/tent-forum.jpg",
     icon: "👥",
-    link: "community_manufacturer.html"
+    link: "community_manufacturer.php"
   },
   {
     key: "settings",
@@ -53,7 +53,7 @@ const tents = [
     desc: "Configure your preferences",
     img: "../../assests/tent-settings.jpg",
     icon: "⚙️",
-    link: "/settings"
+    link: "setting_manufacturer.html"
   },
   {
     key: "payment",
