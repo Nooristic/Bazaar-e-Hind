@@ -37,7 +37,7 @@ const tents = [
     desc: "Manage exclusive partnerships",
     img: "../../assests/tent-exclusivity.jpg",
     icon: "📝",
-    link: "ex_agreements_manufacturer.html"
+    link: "ex_agreements_manufacturer.php"
   },
   {
     key: "community",
