@@ -53,7 +53,7 @@ const tents = [
     desc: "Configure your preferences",
     img: "../../assests/tent-settings.jpg",
     icon: "⚙️",
-    link: "setting_manufacturer.html"
+    link: "setting_manufacturer.php"
   },
   {
     key: "payment",

@@ -19,29 +19,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // === IMAGE UPLOAD – 100% WORKING FOR YOUR STRUCTURE ===
 $uploaded = [];
-$upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/trial_project/uploads/';   // ← THIS IS BULLETPROOF
+$upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/trial_project/uploads/';
 
-// Create uploads folder if missing
 if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0777, true);
 }
 
 if (!empty($_FILES['images']['name'][0])) {
     $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-    foreach ($_FILES['images']['name'] as $key => $name) {
-        if ($_FILES['images']['error'][$key] !== UPLOAD_ERR_OK) continue;
 
-        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowed) || $_FILES['images']['size'][$key] > 3*1024*1024) continue;
+    foreach ($_FILES['images']['name'] as $key => $imageName) {
+
+        if ($_FILES['images']['error'][$key] !== UPLOAD_ERR_OK) {
+            continue;
+        }
+
+        $ext = strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, $allowed) || $_FILES['images']['size'][$key] > 3 * 1024 * 1024) {
+            continue;
+        }
 
         $newname = 'fabric_' . uniqid() . '_' . time() . '.' . $ext;
         $destination = $upload_dir . $newname;
 
         if (move_uploaded_file($_FILES['images']['tmp_name'][$key], $destination)) {
-            $uploaded[] = 'uploads/' . $newname;   // ← this path is correct for display
+            $uploaded[] = 'uploads/' . $newname;
         }
     }
 }
+
 
     $image_json = !empty($uploaded) ? json_encode($uploaded) : null;
     $colors_json = !empty($colors) ? json_encode($colors) : null;
@@ -103,7 +110,7 @@ if (!empty($_FILES['images']['name'][0])) {
   <?php endif; ?>
 
   <form method="POST" enctype="multipart/form-data">
-    <label>Fabric Name *</label>
+<label>Fabric Name *</label>
     <input type="text" name="name" required>
 
     <label>Description *</label>
