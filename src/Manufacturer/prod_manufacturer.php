@@ -53,121 +53,62 @@ $mysqli->close();
 <!-- base is OK because we use ABSOLUTE image URLs -->
 <base href="../../src/Manufacturer/">
 
+<link rel="stylesheet" href="css_all_pages.css">
+
 <style>
-:root { --bazaar-bg: rgba(255, 245, 235, 0.92); }
-body { background: transparent; font-family: 'Georgia', serif; margin:0; padding:0; color:#3e2723; }
-#bg-video { position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:-1; }
-
-.header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    padding: 18px 24px;
-    background: var(--bazaar-bg);
-    border-bottom: 2px solid #e0c68c;
-}
-.back-link { color:#6d4c1e; text-decoration:none; font-size:1.2rem; font-weight:bold; }
-.header-title { font-size:2rem; font-weight:bold; color:#5d3a1a; }
-
+/* Page-specific styles (shared/global CSS moved to css_all_pages.css) */
 .top-bar {
-    display:flex; gap:18px; padding:22px 38px 0;
-    background:var(--bazaar-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 38px;
 }
 .tab-btn, .add-btn {
     padding:7px 22px; border-radius:18px;
-    border:2px solid #c7a76c;
-    background:var(--bazaar-bg);
+    border:2px solid var(--border);
+    background:var(--tab-inactive);
     font-size:1.1rem; cursor:pointer;
 }
-.add-btn {
-        margin-left: auto;  
-    padding:7px 22px; border-radius:18px;
-    border:2px solid #c7a76c;
-    background:var(--bazaar-bg);
-    font-size:1.1rem; cursor:pointer;
-}
-.tab-btn.active, .tab-btn:hover,
-.add-btn:hover { background:#ffe7b3; border-color:#a67c52; }
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.edit-btn, .delete-btn {
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.edit-btn {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.edit-btn:hover {
-    background: #bfdbfe;
-}
-
-.delete-btn {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.delete-btn:hover {
-    background: #fecaca;
-}
-
+.add-btn { margin-left: auto; }
+.tab-btn.active, .tab-btn:hover, .add-btn:hover { background:var(--tab-active); border-color:var(--primary); }
 
 .products-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-    gap:30px; padding:38px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 38px;
 }
+
 .product-card {
-    background:var(--bazaar-bg);
-    border-radius:12px;
-    border:2px solid #e0c68c;
-    box-shadow:0 2px 12px rgba(180,140,60,.08);
+    background: var(--bazaar-bg);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    box-shadow: 0 2px 12px rgba(180, 140, 60, 0.08);
+    padding: 20px;
 }
-.product-img {
-    width:90%; height:110px;
-    margin:18px auto 10px;
-    overflow:hidden; border-radius:8px;
-}
+
+.product-img { width:90%; height:110px; margin:18px auto 10px; overflow:hidden; border-radius:8px; }
 .product-img img { width:100%; height:100%; object-fit:cover; }
 
-.product-title { text-align:center; font-weight:bold; color:#6d4c1e; }
-.product-desc { text-align:center; font-size:.95rem; color:#8d6e3f; height:40px; overflow:hidden; }
+.product-title { text-align:center; font-weight:bold; color:#6d4c1e; margin-bottom:10px; }
+
+.product-details { font-size:0.9rem; color:#6d4c1e; padding:0 14px; line-height:1.4; }
+.product-details div { margin:3px 0; }
+.product-details span { font-weight:bold; color:#5d3a1a; }
 
 .status { padding:4px 12px; border-radius:20px; font-size:.8rem; font-weight:bold; margin:8px auto; display:inline-block; }
 .pending { background:#fff3cd; color:#856404; }
 .approved { background:#d4edda; color:#155724; }
 .rejected { background:#f8d7da; color:#721c24; }
 
+.action-buttons { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+.edit-btn, .delete-btn { padding:6px 14px; border-radius:12px; font-size:0.85rem; font-weight:bold; border:none; cursor:pointer; text-decoration:none; }
+.edit-btn { background:#dbeafe; color:#1e40af; }
+.edit-btn:hover { background:#bfdbfe; }
+.delete-btn { background:#fee2e2; color:#991b1b; }
+.delete-btn:hover { background:#fecaca; }
+
 .empty { text-align:center; padding:80px; font-size:1.4rem; color:#8d6e3f; }
-.product-details {
-    font-size: 0.9rem;
-    color: #6d4c1e;
-    padding: 0 14px;
-    line-height: 1.4;
-}
-
-.product-details div {
-    margin: 3px 0;
-}
-
-.product-details span {
-    font-weight: bold;
-    color: #5d3a1a;
-}
-
 </style>
 </head>
 
@@ -179,11 +120,11 @@ body { background: transparent; font-family: 'Georgia', serif; margin:0; padding
 </video>
 <div class="header">
     <a href="bazaar-homepage.php" class="back-link">← Home</a>
-    <span class="header-title" style="text-align:center;">
-        Product/Fabric Management
-    </span>
-    <div></div>
-</div>
+    <span class="header-title">Product/Fabric Management</span>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>
+    </div>
+  </div>
 <div class="top-bar">
     <button class="tab-btn <?= $filter === 'public' ? 'active' : '' ?>"
         onclick="location.href='prod_manufacturer.php'">All Products</button>
@@ -227,61 +168,58 @@ $first = !empty($images)
 
         <div class="product-title"><?= htmlspecialchars($f['name']) ?></div>
 
-<!-- ✅ ADD THIS BLOCK -->
-<div class="product-details">
-    <div>
-        <span>Composition:</span>
-        <?= $f['composition'] !== null && $f['composition'] !== ''
-            ? htmlspecialchars($f['composition'])
-            : '—'; ?>
+    <div class="product-details">
+        <div>
+            <span>Composition:</span>
+            <?= $f['composition'] !== null && $f['composition'] !== ''
+                ? htmlspecialchars($f['composition'])
+                : '—'; ?>
+        </div>
+
+        <div>
+            <span>GSM:</span>
+            <?= $f['gsm'] !== null
+                ? (int)$f['gsm']
+                : '—'; ?>
+        </div>
+
+        <div>
+            <span>MOQ:</span>
+            <?= $f['moq'] !== null
+                ? (int)$f['moq']
+                : '—'; ?>
+        </div>
+
+        <div>
+            <span>Colors:</span>
+            <?php
+                $colors = json_decode($f['color_options'] ?? '[]', true);
+                echo !empty($colors)
+                    ? htmlspecialchars(implode(', ', $colors))
+                    : '—';
+            ?>
+        </div>
+
+        <div>
+            <span>Visibility:</span>
+            <?= ucfirst($f['visibility_type']) ?>
+        </div>
     </div>
 
-    <div>
-        <span>GSM:</span>
-        <?= $f['gsm'] !== null
-            ? (int)$f['gsm']
-            : '—'; ?>
+    <div class="status <?= $status_class ?>">
+        <?= ucwords(str_replace('_', ' ', $f['status'])) ?>
     </div>
 
-    <div>
-        <span>MOQ:</span>
-        <?= $f['moq'] !== null
-            ? (int)$f['moq']
-            : '—'; ?>
+    <div class="action-buttons">
+        <a href="edit_fabric.php?id=<?= $f['fabric_id'] ?>" class="edit-btn">Edit</a>
+
+        <form method="POST" action="delete_fabric.php"
+              onsubmit="return confirm('Are you sure you want to delete this fabric?');"
+              style="display:inline;">
+            <input type="hidden" name="fabric_id" value="<?= $f['fabric_id'] ?>">
+            <button type="submit" class="delete-btn">Delete</button>
+        </form>
     </div>
-
-    <div>
-        <span>Colors:</span>
-        <?php
-            $colors = json_decode($f['color_options'] ?? '[]', true);
-            echo !empty($colors)
-                ? htmlspecialchars(implode(', ', $colors))
-                : '—';
-        ?>
-    </div>
-
-    <div>
-        <span>Visibility:</span>
-        <?= ucfirst($f['visibility_type']) ?>
-    </div>
-</div>
-
-<!-- ✅ END DETAILS -->
-
-<div class="status <?= $status_class ?>">
-    <?= ucwords(str_replace('_',' ',$f['status'])) ?>
-</div>
-
-        <div class="action-buttons">
-    <a href="edit_fabric.php?id=<?= $f['fabric_id'] ?>" class="edit-btn">Edit</a>
-
-    <form method="POST" action="delete_fabric.php"
-          onsubmit="return confirm('Are you sure you want to delete this fabric?');"
-          style="display:inline;">
-        <input type="hidden" name="fabric_id" value="<?= $f['fabric_id'] ?>">
-        <button type="submit" class="delete-btn">Delete</button>
-    </form>
-</div>
     </div>
 <?php endforeach; ?>
 <?php endif; ?>

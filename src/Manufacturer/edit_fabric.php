@@ -109,28 +109,17 @@ $colors_value = !empty($fabric['color_options'])
 <meta charset="UTF-8">
 <title>Edit Fabric</title>
 <base href="../../src/Manufacturer/">
-
+    <link rel="stylesheet" href="css_all_pages.css">
 <style>
-:root { --bazaar-bg: rgba(255,245,235,.92); }
-body { font-family:Georgia, serif; background:transparent; color:#3e2723; }
-#bg-video { position:fixed; inset:0; object-fit:cover; z-index:-1; }
-.container {
-    max-width:800px; margin:40px auto; padding:30px;
-    background:var(--bazaar-bg); border-radius:16px;
-    border:2px solid #e0c68c;
-}
+/* Page-specific edit fabric styles; globals (vars, body, bg-video, header) are in css_all_pages.css */
+.container { max-width:800px; margin:40px auto; padding:30px; background:var(--bazaar-bg); border-radius:16px; border:2px solid var(--border); }
+.btn { }
 input, textarea, select {
     width:100%; padding:12px; margin:10px 0;
     border-radius:10px; border:2px solid #c7a76c;
 }
 label { font-weight:bold; color:#6d4c1e; }
-.btn {
-    padding:12px 30px; border-radius:12px;
-    background:#b8860b; color:white; border:none;
-    font-size:1.1rem; cursor:pointer;
-}
-.success { background:#d4edda; padding:15px; border-radius:8px; margin-bottom:15px; }
-.error { background:#f8d7da; padding:15px; border-radius:8px; margin-bottom:15px; }
+/* .btn, .success, .error centralized in css_all_pages.css */
 .back { display:inline-block; margin-bottom:20px; color:#6d4c1e; font-weight:bold; }
 </style>
 </head>

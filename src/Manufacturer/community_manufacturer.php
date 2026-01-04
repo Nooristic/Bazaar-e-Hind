@@ -68,18 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Bazaar-e-Hind - Manufacturer Community Forum</title>
   <base href="../../src/Manufacturer/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css_all_pages.css">
   <style>
-    :root {
-      --bazaar-bg: #f5ebe3;
-      --primary: #b88c2b;
-      --border: #e0c68c;
-      --text: #3e2723;
-    }
-    body { margin:0; font-family:'Georgia',serif; background:transparent; color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-    #bg-video { position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:-1; opacity:1; }
-    header { display:flex; align-items:center; background:var(--bazaar-bg); border-bottom:2px solid var(--border); padding:18px 24px; gap:18px; }
-    .back-link { color:var(--primary); text-decoration:none; font-size:1.2rem; font-weight:bold; }
-    .header-title { font-size:1.6rem; font-weight:bold; }
+    /* Page-specific forum styles; global variables, body, header and footer live in css_all_pages.css */
     .forum-container { flex:1; padding:32px; display:flex; gap:32px; align-items:flex-start; }
     .posts-section { flex:2; background:#fff; border-radius:12px; border:1.5px solid var(--border); padding:18px; box-shadow:0 2px 8px rgba(180,140,60,0.05); }
     .posts-title { font-size:1.2rem; font-weight:bold; color:#6d4c1e; margin-bottom:12px; }
@@ -96,12 +87,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .post-item.active .post-snippet { display:none; }
     .post-replies { position:absolute; right:18px; bottom:10px; background:white; padding:2px 10px; border-radius:8px; font-size:0.95rem; color:#b88c2b; }
 
+    /* Replies list */
+    .replies-list { display:none; margin-top:12px; padding-left:12px; border-left:2px solid rgba(184,140,43,0.12); }
+    .reply-item { background:#fff; padding:10px; border-radius:8px; margin-bottom:8px; color:#4a3320; }
+    .reply-author { font-weight:700; color:#8a5b22; font-size:0.9rem; }
+    .reply-time { font-size:0.8rem; color:#8b6a4a; margin-left:8px; }
+
     /* Engagement */
     .engagement-bar { margin-top:12px; display:flex; gap:16px; align-items:center; font-size:0.95rem; }
     .like-btn { background:none; border:1.5px solid #b88c2b; color:#b88c2b; padding:4px 12px; border-radius:20px; cursor:pointer; }
     .like-btn.liked { background:#b88c2b; color:white; }
-    .reply-btn { background:none; border:none; color:#6d4c1e; cursor:pointer; font-weight:500; }
+    .reply-btn { background:none; border:none; color:#6d4c1e; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:6px; }
+    .reply-btn .heart { font-size:18px; color:#b88c2b; }
     .reply-box { display:none; margin-top:12px; }
+    .post-item.active .replies-list { display:block; }
     .reply-text { width:100%; min-height:60px; padding:8px; border:1.5px solid var(--border); border-radius:8px; background:#fffbe6; }
     .submit-reply { background:var(--primary); color:white; border:none; padding:6px 16px; border-radius:20px; cursor:pointer; margin-top:6px; }
 
@@ -109,8 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .form-title { font-weight:bold; color:#6d4c1e; margin-bottom:10px; }
     .form-group label { display:block; margin-bottom:4px; }
     .form-group input, .form-group textarea, .form-group select { width:100%; padding:8px 10px; border:1.5px solid var(--border); border-radius:7px; background:#fffbe6; }
-    .submit-btn { background:var(--primary); color:white; border:none; padding:10px 30px; border-radius:22px; font-weight:bold; cursor:pointer; margin-top:18px; display:flex; align-items:center; gap:6px; }
-    footer { background:#fffbe6; padding:16px; text-align:center; border-top:2px solid var(--border); margin-top:auto; }
+    /* submit button styling centralized in css_all_pages.css */
+    /* footer styles moved to css_all_pages.css */
     .footer-links a { color:#6d4c1e; margin:0 16px; text-decoration:none; }
     @media (max-width:1050px) { .forum-container { flex-direction:column; } }
   </style>
@@ -120,10 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <source src="../../assests/silk video.mp4" type="video/mp4">
   </video>
 
-  <header>
+  <div class="header">
     <a href="bazaar-homepage.php" class="back-link">← Home</a>
     <span class="header-title">Community Forum</span>
-  </header>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>
+    </div>
+</div>
 
   <main class="forum-container">
     <section class="posts-section">
@@ -153,6 +155,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_liked = $check->get_result()->num_rows > 0;
                 $check->close();
             }
+
+            // Fetch replies for this post
+            $replies = [];
+            $rstmt = $conn->prepare("SELECT p.post_id, p.content, p.created_at, u.company_name AS author FROM forum_posts p JOIN users u ON p.user_id = u.user_id WHERE p.parent_post_id = ? AND p.status = 'active' ORDER BY p.created_at ASC");
+            if ($rstmt) {
+              $rstmt->bind_param("i", $post['post_id']);
+              $rstmt->execute();
+              $res = $rstmt->get_result();
+              if ($res) $replies = $res->fetch_all(MYSQLI_ASSOC);
+              $rstmt->close();
+            }
           ?>
             <div class="post-item" onclick="togglePost(this)">
               <div class="post-header">
@@ -166,10 +179,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div class="engagement-bar">
                 <button class="like-btn <?= $user_liked ? 'liked' : '' ?>"
                         onclick="event.stopPropagation(); toggleLike(<?= $post['post_id'] ?>, this)">
-                  Heart <?= $like_count ?> Like<?= $like_count != 1 ? 's' : '' ?>
+                  &#10084; <?= $like_count ?> Like<?= $like_count != 1 ? 's' : '' ?>
                 </button>
                 <button class="reply-btn" onclick="event.stopPropagation(); showReplyBox(<?= $post['post_id'] ?>, this)">
-                  Reply
+                  <span class="heart">Reply</span>
                 </button>
                 <span class="post-replies"><?= (int)$post['reply_count'] ?> Replies</span>
               </div>
@@ -179,6 +192,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button class="submit-reply" onclick="event.stopPropagation(); submitReply(<?= $post['post_id'] ?>, this)">
                   Post Reply
                 </button>
+              </div>
+
+              <div class="replies-list">
+                <?php if (!empty($replies)): ?>
+                  <?php foreach ($replies as $r): ?>
+                    <div class="reply-item">
+                      <div><span class="reply-author"><?= htmlspecialchars($r['author']) ?></span>
+                      <span class="reply-time"><?= htmlspecialchars(date('Y-m-d H:i', strtotime($r['created_at']))) ?></span></div>
+                      <div class="reply-content"><?= nl2br(htmlspecialchars($r['content'])) ?></div>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </div>
             </div>
           <?php endforeach; ?>
@@ -211,15 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <button class="submit-btn" type="submit">Submit</button>
     </form>
   </main>
-
-  <footer>
-    <div class="footer-links">
-      <a href="#">FAQs</a>
-      <a href="#">Terms & Conditions</a>
-      <a href="#">Privacy Policy</a>
-    </div>
-  </footer>
-
   <script>
     function togglePost(div) {
       document.querySelectorAll('.post-item').forEach(item => {

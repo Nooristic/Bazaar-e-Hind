@@ -80,18 +80,14 @@ if (!empty($_FILES['images']['name'][0])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Fabric</title>
   <base href="../../src/Manufacturer/">
+  <link rel="stylesheet" href="css_all_pages.css">
   <style>
-    :root { --bazaar-bg: rgba(255, 245, 235, 0.92); }
-    body { font-family: 'Georgia', serif; margin:0; padding:0; background: transparent; color:#3e2723; }
-    #bg-video { position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:-1; opacity:1; }
-    .container { max-width:800px; margin:40px auto; padding:30px; background:var(--bazaar-bg); border-radius:16px; border:2px solid #e0c68c; box-shadow:0 8px 30px rgba(0,0,0,0.15); }
+    /* Page-specific add-fabric styles; globals moved to css_all_pages.css */
+    .container { max-width:800px; margin:40px auto; padding:30px; background:var(--bazaar-bg); border-radius:16px; border:2px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,0.15); }
     h2 { text-align:center; color:#5d3a1a; margin-bottom:30px; }
     input, textarea, select { width:100%; padding:12px; margin:10px 0; border:2px solid #c7a76c; border-radius:10px; font-family:inherit; font-size:1rem; }
     label { font-weight:bold; color:#6d4c1e; margin-top:15px; display:block; }
-    .btn { padding:12px 30px; background:#b8860b; color:white; border:none; border-radius:12px; font-size:1.1rem; cursor:pointer; margin-top:20px; }
-    .btn:hover { background:#a07800; }
-    .success { background:#d4edda; color:#155724; padding:15px; border-radius:8px; text-align:center; margin:20px 0; font-weight:bold; }
-    .error { background:#f8d7da; color:#721c24; padding:15px; border-radius:8px; text-align:center; margin:20px 0; font-weight:bold; }
+    /* .btn, .success, .error centralized in css_all_pages.css */
     .back { display:inline-block; margin:20px 0; color:#6d4c1e; text-decoration:none; font-weight:bold; }
   </style>
 </head>

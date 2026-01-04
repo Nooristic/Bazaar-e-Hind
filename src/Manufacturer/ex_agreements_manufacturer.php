@@ -112,16 +112,10 @@ $agreements = $mysqli->query("
   <title>Bazaar-e-Hind - Exclusivity Agreements</title>
   <base href="../../src/Manufacturer/">
 
+    <link rel="stylesheet" href="css_all_pages.css">
+  
   <style>
-    :root { --bazaar-bg: rgba(255,245,235,0.96); --primary:#b88c2b; --border:#e0c68c; --text:#3e2723; }
-    body { margin:0; font-family:'Georgia',serif; background:transparent; color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-    #bg-video { position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:-1; opacity:1; pointer-events:none; }
-
-    .header { display:flex; justify-content:space-between; align-items:center; padding:18px 32px; background:var(--bazaar-bg); border-bottom:2px solid var(--border); }
-    .back-link { color:#6d4c1e; text-decoration:none; font-size:1.3rem; font-weight:bold; display:flex; align-items:center; gap:8px; }
-    .back-link:hover { color:#a67c52; }
-    .header-title { font-size:2rem; font-weight:bold; color:#5d3a1a; }
-
+    /* Page-specific styles; globals (variables, body, header, links, bg-video) are in css_all_pages.css */
     .container { flex:1; padding:20px 38px; display:flex; gap:40px; align-items:flex-start; }
     .list-section { flex:2; background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 12px rgba(180,140,60,.08); border:1.5px solid var(--border); }
     .list-title { font-size:1.3rem; font-weight:bold; margin-bottom:15px; color:#6d4c1e; }
@@ -141,11 +135,7 @@ $agreements = $mysqli->query("
     select, textarea, input[type=date] { width:100%; padding:10px; border:1.5px solid var(--border); border-radius:8px; background:#fffbe6; }
     select[multiple] { height:120px; }
     .form-row { display:flex; align-items:center; gap:12px; }
-    .submit-btn { background:var(--primary); color:#fff; border:none; padding:12px 32px; border-radius:25px; font-size:1.1rem; font-weight:bold; cursor:pointer; width:100%; margin-top:10px; }
-    .submit-btn:hover { background:#a67c52; }
-    .msg { padding:12px; border-radius:8px; margin:15px 0; text-align:center; font-weight:bold; }
-    .msg.success { background:#d4edda; color:#155724; }
-    .msg.error { background:#f8d7da; color:#721c24; }
+    /* submit button and messages moved to css_all_pages.css */
 
     footer { background:#fffbe6; border-top:2px solid var(--border); padding:16px; text-align:center; }
     .footer-links a { margin:0 15px; color:#6d4c1e; text-decoration:none; font-weight:500; }
@@ -163,8 +153,10 @@ $agreements = $mysqli->query("
   <div class="header">
     <a href="bazaar-homepage.php" class="back-link">← Home</a>
     <div class="header-title">Exclusivity Agreements</div>
-    <div class="profile-btn">Profile Icon</div>
-  </div>
+     <div class="profile-btn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>
+    </div> 
+   </div>
 
   <div class="container">
     <!-- Existing Agreements -->
@@ -251,15 +243,6 @@ $agreements = $mysqli->query("
       </p>
     </form>
   </div>
-
-  <footer>
-    <div class="footer-links">
-      <a href="#">FAQs</a>
-      <a href="#">Terms & Conditions</a>
-      <a href="#">Privacy Policy</a>
-    </div>
-  </footer>
-
 </body>
 </html>
 

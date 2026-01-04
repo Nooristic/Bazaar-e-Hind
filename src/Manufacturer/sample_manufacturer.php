@@ -99,14 +99,9 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
   <title>Bazaar-e-Hind - Manufacturer Sample Management</title>
   <base href="../../src/Manufacturer/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css_all_pages.css">
   <style>
-    :root{--bazaar-bg:#f5ebe3;--primary:#b88c2b;--accent:#e0c68c;--border:#e0c68c;--text:#3e2723;--btn:#ffe7b3;--btn-hover:#ffd180}
-    body{margin:0;font-family:'Georgia',serif;background:transparent;color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-    #bg-video{position:fixed;top:0;left:0;min-width:100vw;min-height:100vh;width:100vw;height:100vh;object-fit:cover;z-index:-1;opacity:1;pointer-events:none}
-    header{display:flex;align-items:center;justify-content:flex-start;background:var(--bazaar-bg);border-bottom:2px solid var(--border);padding:18px 24px;gap:18px}
-    .back-link{color:var(--primary);text-decoration:none;font-size:1.2rem;font-weight:bold;display:flex;align-items:center;transition:color .15s}
-    .back-link:hover{color:#a67c52}
-    .header-title{font-size:1.6rem;font-weight:bold;letter-spacing:1px}
+    /* Page-specific sample management styles; global header/body/bg-video/footer live in css_all_pages.css */
     .sample-container{flex:1;padding:32px 32px 24px;display:flex;flex-direction:column;min-width:0}
     .responsive-table{width:100%;display:flex;flex-direction:column;gap:16px;overflow-x:auto}
     .table-row,.table-header{display:flex;align-items:stretch;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(180,140,60,.05);border:1.5px solid var(--border);min-width:900px}
@@ -130,10 +125,13 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
     <source src="../../assests/silk video.mp4" type="video/mp4">
   </video>
 
-  <header>
+  <div class="header">
     <a href="bazaar-homepage.php" class="back-link">&#8592; Home</a>
     <span class="header-title">Sample Management</span>
-  </header>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>
+    </div>
+</div>
 
   <main class="sample-container">
     <div class="responsive-table">
@@ -200,14 +198,6 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
       <?php endforeach; endif; ?>
     </div>
   </main>
-
-  <footer>
-    <div class="footer-links">
-      <a href="#">FAQs</a>
-      <a href="#">Terms & Conditions</a>
-      <a href="#">Privacy Policy</a>
-    </div>
-  </footer>
 
   <script>
     function toggleDispatch(btn) {
