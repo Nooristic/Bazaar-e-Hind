@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exclusivity Agreement</title>
+
+<style>
+/* ===== FONT & BASE ===== */
+body {
+  font-family: 'Georgia', serif;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #3e2723;
+  min-height: 100vh;
+}
+
+/* ===== BACKGROUND VIDEO ===== */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== HEADER ===== */
+.blue-header {
+  background-color: rgba(73, 40, 22, 0.389);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.blue-header .back-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+}
+
+/* ===== TABLE ===== */
+.agreements-table {
+  width: 100%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.agreements-table th,
+.agreements-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-family: inherit;
+}
+
+.agreements-table th {
+  background-color: #e0c68c;
+  color: white;
+}
+
+.agreements-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.status-pending { background-color: #ffc107; color: white; }
+.status-approved { background-color: #28a745; color: white; }
+.status-rejected { background-color: #dc3545; color: white; }
+
+/* ===== ACTION BUTTONS ===== */
+.actions {
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #e0c68c;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.actions button::after {
+  content: " ₹";
+}
+
+/* ===== MODAL FORM ===== */
+.form-container {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: e0c68c;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.form-container.active {
+  display: block;
+}
+
+.form-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .agreements-table thead {
+    display: none;
+  }
+
+  .agreements-table tr {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .agreements-table td {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .agreements-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ✅ BACKGROUND VIDEO -->
+<video autoplay muted loop playsinline id="bg-video">
+  <source src="../../assests/silk video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<header class="blue-header">
+  <a href="../login.html" class="back-link">← Home</a>
+  <h1>Exclusivity Agreement</h1>
+</header>
+
+<div class="container">
+  <table class="agreements-table">
+    <thead>
+      <tr>
+        <th>Agreement ID</th>
+        <th>Manufacturer</th>
+        <th>Fabrics</th>
+        <th>Duration</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Agreement ID">EA12345</td>
+        <td data-label="Manufacturer">ABC Textiles</td>
+        <td data-label="Fabrics">Cotton, Silk</td>
+        <td data-label="Duration">6 months</td>
+        <td data-label="Status">
+          <span class="status-badge status-pending">Pending</span>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Agreement ID">EA67890</td>
+        <td data-label="Manufacturer">XYZ Textiles</td>
+        <td data-label="Fabrics">Polyester</td>
+        <td data-label="Duration">1 year</td>
+        <td data-label="Status">
+          <span class="status-badge status-approved">Approved</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="actions">
+    <button id="request-new">Request New Exclusivity</button>
+  </div>
+
+  <div class="form-container" id="exclusivity-form">
+    <h2>Request New Exclusivity</h2>
+
+    <label>Select Manufacturer</label>
+    <select>
+      <option>ABC Textiles</option>
+      <option>XYZ Textiles</option>
+    </select>
+
+    <label>Desired Fabrics</label>
+    <select multiple>
+      <option>Cotton</option>
+      <option>Silk</option>
+      <option>Polyester</option>
+    </select>
+
+    <label>Proposed Duration & Terms</label>
+    <textarea rows="4"></textarea>
+
+    <button id="submit-request">Submit Request</button>
+  </div>
+</div>
+
+<footer style="background:rgba(255,255,255,0.92);text-align:center;padding:1rem;">
+  &copy; 2025 Fabric Bazaar. All rights reserved.
+</footer>
+
+<script>
+document.getElementById('request-new').onclick = () =>
+  document.getElementById('exclusivity-form').classList.add('active');
+
+document.getElementById('submit-request').onclick = () => {
+  alert('Request submitted successfully!');
+  document.getElementById('exclusivity-form').classList.remove('active');
+};
+</script>
+
+</body>
+</html>

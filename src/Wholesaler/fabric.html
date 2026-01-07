@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fabric Detail - Silk Saffron</title>
+  <base href="../../src/Wholesaler/">
+
+  <style>
+    :root {
+      --bg: rgba(255, 245, 235, 0.92);
+      --gold: #c7a76c;
+      --gold-dark: #a67c52;
+      --text: #3e2723;
+      --text-light: #8d6e3f;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', serif;
+      color: var(--text);
+      background: transparent;
+      min-height: 100vh;
+    }
+    #bg-video {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      object-fit: cover; z-index: -1;
+    }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 24px; background: var(--bg); border-bottom: 2px solid #e0c68c;
+    }
+    .back-link { color: var(--text); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
+    .header-title { font-size: 2rem; font-weight: bold; }
+    .profile-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--bg);
+      border: 2px solid #e0c68c; display: grid; place-items: center; }
+    .profile-btn svg { width: 24px; height: 24px; fill: #8d6e3f; }
+
+    .container {
+      max-width: 1200px; margin: 0 auto; padding: 30px 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+      background: var(--bg);
+    }
+    .carousel {
+      position: relative; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .carousel img {
+      width: 100%; height: 500px; object-fit: cover; display: none;
+    }
+    .carousel img.active { display: block; }
+    .prev, .next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.5); color: white; border: none;
+      width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .prev { left: 15px; } .next { right: 15px; }
+
+    .details {
+      padding: 20px 10px;
+    }
+    .fabric-name {
+      font-size: 2.2rem; font-weight: bold; margin-bottom: 10px; color: #6d4c1e;
+    }
+    .badge {
+      display: inline-block; padding: 6px 16px; border-radius: 20px;
+      font-weight: bold; font-size: 0.9rem; margin-bottom: 15px;
+    }
+    .badge.public { background: #d4af37; color: white; }
+    .badge.exclusive { background: #2e8b57; color: white; }
+    .badge.restricted { background: #b22222; color: white; }
+
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;
+      font-size: 1.05rem;
+    }
+    .info-item strong { color: #6d4c1e; }
+
+    .color-options {
+      display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap;
+    }
+    .color-swatch {
+      width: 50px; height: 50px; border-radius: 50%; border: 3px solid #e0c68c;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+
+    .pricing-table {
+      width: 100%; border-collapse: collapse; margin: 25px 0;
+      background: white; border-radius: 10px; overflow: hidden;
+    }
+    .pricing-table th, .pricing-table td {
+      padding: 12px; text-align: center; border-bottom: 1px solid #eee;
+    }
+    .pricing-table th { background: #ffe7b3; color: #6d4c1e; font-weight: bold; }
+
+    .buttons {
+      display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;
+    }
+    .btn {
+      padding: 14px 28px; border-radius: 30px; border: none;
+      font-family: Georgia, serif; font-weight: bold; font-size: 1.1rem;
+      cursor: pointer; transition: 0.2s; position: relative;
+    }
+    .btn-primary {
+      background: #ffe7b3; color: #6d4c1e; flex: 1;
+    }
+    .btn-primary:hover { background: #ffd180; }
+    .btn::after { content: " ₹"; font-size: 1.4rem; }
+
+    /* Modal */
+    .modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--bg); padding: 30px; border-radius: 16px;
+      width: 90%; max-width: 500px; position: relative;
+    }
+    .close {
+      position: absolute; top: 15px; right: 20px; font-size: 2rem;
+      cursor: pointer; color: #888;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 12px; border: 2px solid var(--gold); border-radius: 10px;
+      font-family: inherit;
+    }
+    .form-group textarea { height: 100px; resize: vertical; }
+
+    footer {
+      text-align: center; padding: 20px; background: var(--bg); margin-top: 40px;
+    }
+    footer a { color: var(--text); margin: 0 12px; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+      .carousel img { height: 400px; }
+    }
+    @media (max-width: 600px) {
+      .buttons { flex-direction: column; }
+      .fabric-name { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+  </video>
+
+  <div class="header">
+    <a href="browse-catalog.html" class="back-link">← Back</a>
+    <div class="header-title">Fabric Detail</div>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="5"/>
+        <path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Image Carousel -->
+    <div class="carousel">
+      <img src="../../assests/fabric1.jpg" class="active" alt="Silk Saffron Main">
+      <img src="../../assests/fabric2.jpg" alt="Silk Saffron Closeup">
+      <img src="../../assests/fabric3.jpg" alt="Silk Saffron Texture">
+      <button class="prev" onclick="changeSlide(-1)">❮</button>
+      <button class="next" onclick="changeSlide(1)">❯</button>
+    </div>
+
+    <!-- Details -->
+    <div class="details">
+      <h1 class="fabric-name">Silk Saffron Premium</h1>
+      <span class="badge exclusive">You have exclusive access</span>
+
+      <p style="margin:20px 0; line-height:1.6; opacity:0.9;">
+        Luxurious handwoven pure silk with natural saffron dye. Perfect for high-end sarees and ethnic wear.
+      </p>
+
+      <div class="info-grid">
+        <div class="info-item"><strong>Composition:</strong> 100% Pure Silk</div>
+        <div class="info-item"><strong>GSM:</strong> 120</div>
+        <div class="info-item"><strong>Width:</strong> 44 inches</div>
+        <div class="info-item"><strong>MOQ:</strong> 50 meters</div>
+      </div>
+
+      <div style="margin:20px 0;">
+        <strong>Available Colors:</strong>
+        <div class="color-options">
+          <div class="color-swatch" style="background:#FFD700;"></div>
+          <div class="color-swatch" style="background:#FF8C00;"></div>
+          <div class="color-swatch" style="background:#DC143C;"></div>
+          <div class="color-swatch" style="background:#228B22;"></div>
+        </div>
+      </div>
+
+      <table class="pricing-table">
+        <tr><th>Quantity (meters)</th><th>Price per meter</th></tr>
+        <tr><td>50 – 99</td><td>₹ 780</td></tr>
+        <tr><td>100 – 499</td><td>₹ 720</td></tr>
+        <tr><td>500 +</td><td>₹ 680</td></tr>
+      </table>
+
+      <div class="buttons">
+        <button class="btn btn-primary" onclick="document.getElementById('sampleModal').classList.add('active')">
+          Request Sample
+        </button>
+        <button class="btn btn-primary">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Request Modal -->
+  <div id="sampleModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="this.parentElement.parentElement.classList.remove('active')">&times;</span>
+      <h2 style="margin-bottom:20px; color:#6d4c1e;">Request Fabric Sample</h2>
+      <form>
+        <div class="form-group">
+          <label>Quantity (meters)</label>
+          <input type="number" min="1" max="5" value="1" required>
+        </div>
+        <div class="form-group">
+          <label>Preferred Color</label>
+          <select required>
+            <option>Saffron Gold</option>
+            <option>Deep Orange</option>
+            <option>Crimson Red</option>
+            <option>Forest Green</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes (optional)</label>
+          <textarea placeholder="Any special requirements..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Shipping Address</label>
+          <select required>
+            <option>Main Warehouse - Mumbai</option>
+            <option>Branch Office - Delhi</option>
+            <option>Showroom - Surat</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
+          Submit Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <a href="#">FAQs</a> |
+    <a href="#">Terms & Conditions</a> |
+    <a href="#">Privacy Policy</a>
+  </footer>
+
+  <script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll('.carousel img');
+
+    function changeSlide(n) {
+      slides[slideIndex].classList.remove('active');
+      slideIndex = (slideIndex + n + slides.length) % slides.length;
+      slides[slideIndex].classList.add('active');
+    }
+
+    // Auto-play carousel (optional)
+    setInterval(() => changeSlide(1), 5000);
+
+    // Close modal when clicking outside
+    window.onclick = function(e) {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('active');
+      }
+    }
+  </script>
+</body>
+</html>

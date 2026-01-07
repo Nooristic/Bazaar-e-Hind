@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders Page</title>
+
+<style>
+/* ===== GENERAL ===== */
+body {
+  font-family: 'Georgia', serif;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #5a3e2b;
+}
+
+/* ===== BACKGROUND VIDEO ===== */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+  background: black;
+}
+
+/* ===== HEADER ===== */
+.blue-header {
+  background-color: rgba(90, 30, 15, 0.379);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.blue-header .back-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+}
+
+/* ===== TABLE ===== */
+.orders-table {
+  width: 95%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.orders-table th {
+  background-color: #e0c68c;
+  color: white;
+  text-align: left;
+}
+
+.orders-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* ===== STATUS ===== */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.status-ordered { background-color: #ffc107; }
+.status-confirmed { background-color: #28a745; }
+.status-dispatched { background-color: #17a2b8; }
+.status-delivered { background-color: #6c757d; }
+
+/* ===== ACTIONS ===== */
+.actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0.3rem;
+  font-family: inherit;
+}
+
+.view-invoice {
+  background-color: #512d1a;
+  color: rgb(226, 189, 164);
+}
+
+.pay-remaining {
+  background-color: #d497695e;
+  color: white;
+}
+
+.pay-remaining::after {
+  content: " ₹";
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .orders-table thead {
+    display: none;
+  }
+
+  .orders-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .orders-table td {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .orders-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ✅ BACKGROUND VIDEO -->
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="../../assests/silk video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<header class="blue-header">
+  <a href="../login.html" class="back-link">← Home</a>
+  <h1>Orders</h1>
+</header>
+
+<table class="orders-table">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Date</th>
+      <th>Manufacturer</th>
+      <th>Items</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td data-label="Order ID">12345</td>
+      <td data-label="Date">2025-12-01</td>
+      <td data-label="Manufacturer">ABC Textiles</td>
+      <td data-label="Items">5</td>
+      <td data-label="Total">₹5000</td>
+      <td data-label="Status">
+        <span class="status-badge status-ordered">Ordered</span>
+      </td>
+      <td data-label="Actions" class="actions">
+        <button class="view-invoice">View Invoice</button>
+        <button class="pay-remaining">Pay Remaining</button>
+      </td>
+    </tr>
+
+    <tr>
+      <td data-label="Order ID">67890</td>
+      <td data-label="Date">2025-12-05</td>
+      <td data-label="Manufacturer">XYZ Textiles</td>
+      <td data-label="Items">10</td>
+      <td data-label="Total">₹10000</td>
+      <td data-label="Status">
+        <span class="status-badge status-dispatched">Dispatched</span>
+      </td>
+      <td data-label="Actions" class="actions">
+        <button class="view-invoice">View Invoice</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<footer>
+  <p>&copy; 2025 Fabric Bazaar. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
