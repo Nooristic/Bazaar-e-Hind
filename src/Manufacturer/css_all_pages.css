@@ -17,7 +17,7 @@ body{margin:0;font-family:'Georgia',serif;background:transparent;color:var(--tex
 .header, header {display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:var(--bazaar-bg);border-bottom:2px solid var(--border);gap:18px;position:relative}
 .back-link{color:var(--primary);text-decoration:none;font-size:1.2rem;font-weight:bold;display:flex;align-items:center;transition:color .15s}
 .back-link:hover{color:#a67c52}
-.header-title{color:#f5e1b8;font-size:2rem;font-weight:bold;letter-spacing:1px;position:absolute;left:50%;transform:translateX(-50%);top:50%;transform:translate(-50%, -50%);white-space:nowrap}
+.header-title{color:#4a1e1e86;font-size:2rem;font-weight:bold;letter-spacing:1px;position:absolute;left:50%;transform:translateX(-50%);top:50%;transform:translate(-50%, -50%);white-space:nowrap}
 .header .back-link, header .back-link{z-index:2}
 .profile-btn{z-index:2}
 .profile-btn{width:38px;height:38px;border-radius:50%;background:#f5e1b8;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);cursor:pointer}

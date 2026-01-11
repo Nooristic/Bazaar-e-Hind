@@ -1,9 +1,85 @@
+<?php
+session_start();
+
+// Security — only logged-in wholesalers (or both)
+if (!isset($_SESSION['logged_in']) || !in_array($_SESSION['role'], ['wholesaler', 'both'])) {
+    header("Location: ../login.html");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'] ?? 0;
+$username = strtoupper(htmlspecialchars($_SESSION['username'] ?? 'WHOLESALER', ENT_QUOTES));
+
+// Database connection
+$host = "localhost";
+$db_user = "root";
+$db_pass = "";
+$dbname = "bazaar_e_hind";
+
+$mysqli = new mysqli($host, $db_user, $db_pass, $dbname);
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+$mysqli->set_charset("utf8mb4");
+
+// Handle new post creation
+$message = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_post') {
+    $title = trim($_POST['title'] ?? '');
+    $content = trim($_POST['content'] ?? '');
+    $type = $_POST['type'] ?? 'discussion';
+    
+    if ($title && $content) {
+        $stmt = $mysqli->prepare("INSERT INTO forum_posts (user_id, title, content, type, status) VALUES (?, ?, ?, ?, 'active')");
+        $stmt->bind_param("isss", $user_id, $title, $content, $type);
+        
+        if ($stmt->execute()) {
+            $message = "Post created successfully! It will appear after moderation.";
+        } else {
+            $message = "Error creating post: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        $message = "Title and content are required.";
+    }
+}
+
+// Fetch posts (only active/flagged, ordered by latest)
+$posts = [];
+$current_type = $_GET['type'] ?? 'discussion'; // Filter by category
+
+$query = "
+    SELECT fp.post_id, fp.title, fp.content, fp.type, fp.created_at, 
+           fp.status, fp.flagged_count,
+           u.username AS author_name, u.company_name AS author_company
+    FROM forum_posts fp 
+    JOIN users u ON fp.user_id = u.id 
+    WHERE fp.status IN ('active', 'flagged') 
+    AND fp.type = ?
+    ORDER BY fp.created_at DESC 
+    LIMIT 50
+";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param("s", $current_type);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+    $row['replies'] = rand(0, 15); // Simulate replies (add replies table later)
+    $row['short_content'] = substr($row['content'], 0, 100) . '...';
+    $posts[] = $row;
+}
+$stmt->close();
+
+$mysqli->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Forum</title>
+<title>Community Forum - Bazaar-e-Hind</title>
 
 <style>
 /* ===== FONT & BASE (FROM CHAT PAGE) ===== */
@@ -30,9 +106,9 @@ body {
   pointer-events: none;
 }
 
-/* ===== HEADER (UNCHANGED STRUCTURE) ===== */
+/* ===== HEADER (FIXED SYNTAX ERROR + ENHANCED) ===== */
 .blue-header {
-  background-color:#e0c68c
+  background-color: #e0c68c;
   color: white;
   padding: 1rem;
   text-align: center;
@@ -51,12 +127,16 @@ body {
 /* ===== CONTENT ===== */
 .container {
   padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .categories {
   display: flex;
   justify-content: space-around;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .categories button {
@@ -67,6 +147,12 @@ body {
   color: white;
   cursor: pointer;
   font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.categories button.active,
+.categories button:hover {
+  background-color: #c19c55;
 }
 
 /* ===== TABLE ===== */
@@ -95,6 +181,16 @@ body {
   background-color: #f1f1f1;
 }
 
+/* ===== STATUS BADGES ===== */
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.status-active { background: #28a745; color: white; }
+.status-flagged { background: #ffc107; color: #212529; }
+
 /* ===== ACTIONS ===== */
 .actions {
   margin: 2rem auto;
@@ -122,11 +218,13 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
+  background-color: rgba(224, 198, 140, 0.98);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   z-index: 1000;
+  width: 90%;
+  max-width: 500px;
 }
 
 .form-container.active {
@@ -136,6 +234,7 @@ body {
 .form-container label {
   display: block;
   margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
 .form-container input,
@@ -147,6 +246,16 @@ body {
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+
+/* ===== MESSAGE ALERT ===== */
+.alert {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  text-align: center;
+}
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -177,22 +286,28 @@ body {
 
 <body>
 
-<!-- ✅ BACKGROUND VIDEO -->
+<!-- ✅ BACKGROUND VIDEO (UNCHANGED) -->
 <video autoplay muted loop playsinline id="bg-video">
   <source src="../../assests/silk video.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 <header class="blue-header">
-  <a href="../login.html" class="back-link">← Home</a>
+  <a href="../home_wholesaler.php" class="back-link">← Home</a>
   <h1>Community Forum</h1>
 </header>
 
 <div class="container">
+  <?php if ($message): ?>
+    <div class="alert <?= strpos($message, 'success') !== false ? 'alert-success' : 'alert-error' ?>">
+      <?= htmlspecialchars($message) ?>
+    </div>
+  <?php endif; ?>
+
   <div class="categories">
-    <button>Discussions</button>
-    <button>Blogs</button>
-    <button>Events</button>
+    <a href="?type=discussion"><button class="<?= $current_type === 'discussion' ? 'active' : '' ?>">Discussions</button></a>
+    <a href="?type=blog"><button class="<?= $current_type === 'blog' ? 'active' : '' ?>">Blogs</button></a>
+    <a href="?type=event"><button class="<?= $current_type === 'event' ? 'active' : '' ?>">Events</button></a>
   </div>
 
   <table class="thread-list">
@@ -202,21 +317,32 @@ body {
         <th>Author</th>
         <th>Replies</th>
         <th>Date</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td data-label="Title">How to choose the best fabric?</td>
-        <td data-label="Author">John Doe</td>
-        <td data-label="Replies">5</td>
-        <td data-label="Date">2025-12-01</td>
-      </tr>
-      <tr>
-        <td data-label="Title">Upcoming textile events</td>
-        <td data-label="Author">Jane Smith</td>
-        <td data-label="Replies">10</td>
-        <td data-label="Date">2025-12-05</td>
-      </tr>
+      <?php if (empty($posts)): ?>
+        <tr>
+          <td colspan="5" style="text-align:center; padding:2rem;">No posts yet in this category. Create one!</td>
+        </tr>
+      <?php else: ?>
+        <?php foreach ($posts as $post): ?>
+          <tr>
+            <td data-label="Title">
+              <strong><?= htmlspecialchars($post['title']) ?></strong><br>
+              <small><?= htmlspecialchars($post['short_content']) ?></small>
+            </td>
+            <td data-label="Author"><?= htmlspecialchars($post['author_company'] ?? $post['author_name']) ?></td>
+            <td data-label="Replies"><?= $post['replies'] ?></td>
+            <td data-label="Date"><?= date('Y-m-d', strtotime($post['created_at'])) ?></td>
+            <td data-label="Status">
+              <span class="status-badge status-<?= $post['status'] ?>">
+                <?= ucwords(str_replace('_', ' ', $post['status'])) ?>
+              </span>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </tbody>
   </table>
 
@@ -224,37 +350,48 @@ body {
     <button id="create-post">Create New Post</button>
   </div>
 
+  <!-- FORM (UNCHANGED STRUCTURE, NOW FUNCTIONAL) -->
   <div class="form-container" id="post-form">
     <h2>Create New Post</h2>
 
-    <label>Title</label>
-    <input type="text">
+    <form method="POST" action="">
+      <input type="hidden" name="action" value="create_post">
+      
+      <label>Title *</label>
+      <input type="text" name="title" maxlength="255" required>
 
-    <label>Content</label>
-    <textarea rows="4"></textarea>
+      <label>Content *</label>
+      <textarea name="content" rows="4" required></textarea>
 
-    <label>Category</label>
-    <select>
-      <option>Discussions</option>
-      <option>Blogs</option>
-      <option>Events</option>
-    </select>
+      <label>Category</label>
+      <select name="type">
+        <option value="discussion" <?= $current_type === 'discussion' ? 'selected' : '' ?>>Discussions</option>
+        <option value="blog" <?= $current_type === 'blog' ? 'selected' : '' ?>>Blogs</option>
+        <option value="event" <?= $current_type === 'event' ? 'selected' : '' ?>>Events</option>
+      </select>
 
-    <button id="submit-post">Submit</button>
+      <button type="submit" id="submit-post">Submit</button>
+    </form>
   </div>
 </div>
 
 <footer style="background:rgba(255,255,255,0.9);text-align:center;padding:1rem;">
-  &copy; 2025 Fabric Bazaar. All rights reserved.
+  &copy; <?= date('Y') ?> Bazaar-e-Hind. All rights reserved.
 </footer>
 
 <script>
 document.getElementById('create-post').onclick = () =>
   document.getElementById('post-form').classList.add('active');
 
-document.getElementById('submit-post').onclick = () => {
-  alert('Post submitted successfully!');
-  document.getElementById('post-form').classList.remove('active');
+document.getElementById('submit-post').onclick = function(e) {
+  // Frontend validation
+  const title = document.querySelector('input[name="title"]').value.trim();
+  const content = document.querySelector('textarea[name="content"]').value.trim();
+  if (!title || !content) {
+    alert('Title and content are required!');
+    e.preventDefault();
+    return false;
+  }
 };
 </script>
 

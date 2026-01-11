@@ -137,10 +137,7 @@ $agreements = $mysqli->query("
     .form-row { display:flex; align-items:center; gap:12px; }
     /* submit button and messages moved to css_all_pages.css */
 
-    footer { background:#fffbe6; border-top:2px solid var(--border); padding:16px; text-align:center; }
-    .footer-links a { margin:0 15px; color:#6d4c1e; text-decoration:none; font-weight:500; }
-    .footer-links a:hover { color:var(--primary); }
-
+  
     @media (max-width:1000px) { .container { flex-direction:column; } }
   </style>
 </head>

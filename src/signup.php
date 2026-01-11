@@ -101,7 +101,7 @@ if ($stmt->execute()) {
             header("Location: Manufacturer/bazaar-homepage.php");
             break;
         case 'wholesaler':
-            header("Location: Wholesaler/wholesaler-homepage.php");
+            header("Location: Wholesaler/home_page.php");
             break;
         case 'admin':
             header("Location: Admin/admin-homepage.php");
