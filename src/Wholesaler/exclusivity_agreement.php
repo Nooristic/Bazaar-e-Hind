@@ -1,9 +1,53 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exclusivity Agreements - Bazaar-e-Hind</title>
+<title>Exclusivity Agreements</title>
+
+<style>
+/* ===== FONT & BASE ===== */
+body {
+  font-family: 'Georgia', serif;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #3e2723;
+  min-height: 100vh;
+}
+
+/* ===== BACKGROUND VIDEO ===== */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== HEADER ===== */
+.blue-header {
+  background-color: rgba(73, 40, 22, 0.389);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exclusivity Agreements</title>
 
 <style>
 /* ===== FONT & BASE ===== */
@@ -205,9 +249,7 @@ body {
 </video>
 
 <?php
-session_start();
-
-// Security - only logged-in wholesalers
+// Security - only-logged-in wholesalers
 if (!isset($_SESSION['logged_in']) || !in_array($_SESSION['role'], ['wholesaler', 'both'])) {
     header("Location: ../login.html");
     exit();
@@ -217,8 +259,8 @@ $wholesaler_id = $_SESSION['user_id'] ?? null;
 
 // Database connection (change credentials as per your setup)
 $host = "localhost";
-$user = "your_db_user";
-$pass = "your_db_password";
+$user = "root";
+$pass = "";
 $dbname = "bazaar_e_hind";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
@@ -237,11 +279,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $terms = trim($_POST['terms'] ?? '');
 
     if ($manufacturer_id && $fabrics && $duration_from && $duration_to) {
-        $stmt = $conn->prepare("
-            INSERT INTO exclusivity_agreements 
+        $stmt = $conn->prepare(
+            "INSERT INTO exclusivity_agreements 
             (wholesaler_id, manufacturer_id, fabrics, duration_from, duration_to, terms, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())
-        ");
+            VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())"
+        );
 
         $stmt->bind_param("iissss", 
             $wholesaler_id, 

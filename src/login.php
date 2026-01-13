@@ -69,7 +69,7 @@ switch ($user['role']) {
         exit();
 
     case 'wholesaler':
-        header("Location: Wholesaler/wholesaler-homepage.php");
+        header("Location: Wholesaler/home_page.php");
         exit();
 
     case 'admin':

@@ -3,7 +3,7 @@ const tents = [
     key: "browse",
     label: "Browse Fabrics",
     desc: "Discover premium & exclusive collections",
-    img: "../../assests/tent-browse-fabrics.jpg",
+    img: "../../assests/tent-catalog.jpg",
     icon: "🧵",
     link: "browse_fabrics.php"
   },
@@ -43,7 +43,7 @@ const tents = [
     key: "payments",
     label: "Payments & Invoices",
     desc: "Manage payments, receipts & dues",
-    img: "../../assests/tent-payments.jpg",
+    img: "../../assests/tent-orders.jpg",
     icon: "₹",
     link: "payments_wholesaler.php"
   },
