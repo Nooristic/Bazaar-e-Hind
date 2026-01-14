@@ -99,7 +99,7 @@ $conn->close();
 
     <!-- External CSS -->
     <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="css_all_pages.css" />
+    <link rel="stylesheet" href="../css_all_pages.css" />
 
     <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Corinthia" rel="stylesheet">

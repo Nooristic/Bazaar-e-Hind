@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Bazaar-e-Hind - Manufacturer Community Forum</title>
   <base href="../../src/Manufacturer/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css_all_pages.css">
+  <link rel="stylesheet" href="../css_all_pages.css">
   <style>
     /* Page-specific forum styles; global variables, body, header and footer live in css_all_pages.css */
     .forum-container { flex:1; padding:32px; display:flex; gap:32px; align-items:flex-start; }

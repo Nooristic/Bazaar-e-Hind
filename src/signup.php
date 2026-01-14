@@ -14,17 +14,7 @@ if ($conn->connect_error) {
 
 session_start();
 
-/* ────────────────────── DEMO / EVALUATION MODE ONLY ────────────────────── */
-// REMOVE THESE 6 LINES WHEN YOUR PROJECT IS FINISHED & GOING LIVE
-/* ─────────────── FAST DEMO MODE (NO LAG) — REMOVE AFTER PROJECT ─────────────── */
-$_SESSION = array();                     // instantly clear all old session data
-if (ini_get("session.use_cookies")) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
-}
-session_regenerate_id(true);             // give new session ID instantly
-/* ───────────────────────────────────────────────────────────────────────────── */
-/* ─────────────────────────────────────────────────────────────────────── */
+
 
 // If already logged in → go to homepage
 if (isset($_SESSION['user_id'])) {
@@ -104,7 +94,7 @@ if ($stmt->execute()) {
             header("Location: Wholesaler/home_page.php");
             break;
         case 'admin':
-            header("Location: Admin/admin-homepage.php");
+            header("Location: Admin/admin_homepage.php");
             break;
         default:
             header("Location: login.html");

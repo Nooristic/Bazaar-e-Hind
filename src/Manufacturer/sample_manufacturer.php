@@ -99,7 +99,7 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
   <title>Bazaar-e-Hind - Manufacturer Sample Management</title>
   <base href="../../src/Manufacturer/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css_all_pages.css">
+  <link rel="stylesheet" href="../css_all_pages.css">
   <style>
     /* Page-specific sample management styles; global header/body/bg-video/footer live in css_all_pages.css */
     .sample-container{flex:1;padding:32px 32px 24px;display:flex;flex-direction:column;min-width:0}

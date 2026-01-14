@@ -82,7 +82,7 @@ $result = $stmt->get_result();
   <title>Order Management</title>
   <base href="../../src/Manufacturer/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css_all_pages.css">
+  <link rel="stylesheet" href="../css_all_pages.css">
 </head>
 <body>
   <video autoplay muted loop id="bg-video">

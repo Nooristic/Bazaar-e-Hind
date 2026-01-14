@@ -112,7 +112,7 @@ $agreements = $mysqli->query("
   <title>Bazaar-e-Hind - Exclusivity Agreements</title>
   <base href="../../src/Manufacturer/">
 
-    <link rel="stylesheet" href="css_all_pages.css">
+    <link rel="stylesheet" href="../css_all_pages.css">
   
   <style>
     /* Page-specific styles; globals (variables, body, header, links, bg-video) are in css_all_pages.css */

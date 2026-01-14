@@ -73,7 +73,7 @@ switch ($user['role']) {
         exit();
 
     case 'admin':
-        header("Location: Admin/admin-homepage.php");
+        header("Location: Admin/admin_homepage.php");
         exit();
 
 }

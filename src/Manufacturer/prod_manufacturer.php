@@ -53,7 +53,7 @@ $mysqli->close();
 <!-- base is OK because we use ABSOLUTE image URLs -->
 <base href="../../src/Manufacturer/">
 
-<link rel="stylesheet" href="css_all_pages.css">
+<link rel="stylesheet" href="../css_all_pages.css">
 
 <style>
 /* Page-specific styles (shared/global CSS moved to css_all_pages.css) */
