@@ -1,3 +1,84 @@
+<?php
+session_start();
+
+// Security — only logged-in wholesalers (assuming this page is for wholesalers messaging manufacturers)
+if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'wholesaler') {
+    header("Location: ../login.html");
+    exit();
+}
+
+// Database connection
+$servername = "localhost";
+$username_db = "root"; // Adjust as needed
+$password_db = ""; // Adjust as needed
+$dbname = "bazaar_e_hind"; // Adjust as needed
+
+$conn = new mysqli($servername, $username_db, $password_db, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get current user ID from session (assuming stored as 'user_id')
+$current_user_id = $_SESSION['user_id'];
+
+// Handle sending message
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message']) && isset($_POST['receiver_id'])) {
+    $message = $conn->real_escape_string($_POST['message']);
+    $receiver_id = intval($_POST['receiver_id']);
+    if (!empty($message)) {
+        $sql = "INSERT INTO messages (sender_id, receiver_id, message, timestamp) VALUES ($current_user_id, $receiver_id, '$message', NOW())";
+        $conn->query($sql);
+    }
+    // Redirect to same page with chat selected to refresh
+    header("Location: ?chat=$receiver_id");
+    exit();
+}
+
+// Get selected chat from GET
+$selected_receiver_id = isset($_GET['chat']) ? intval($_GET['chat']) : 0;
+
+// Fetch list of manufacturers for sidebar with unread counts
+$sidebar_manufacturers = [];
+$sql_sidebar = "
+    SELECT u.user_id, u.company_name, COUNT(m.message_id) AS unread
+    FROM users u
+    LEFT JOIN messages m ON m.sender_id = u.user_id AND m.receiver_id = $current_user_id AND m.is_read = 0
+    WHERE u.role = 'manufacturer'
+    GROUP BY u.user_id
+    ORDER BY unread DESC
+";
+$result_sidebar = $conn->query($sql_sidebar);
+if ($result_sidebar) {
+    while ($row = $result_sidebar->fetch_assoc()) {
+        $sidebar_manufacturers[] = $row;
+    }
+}
+
+// Fetch chat history if selected
+$chat_history = [];
+if ($selected_receiver_id > 0) {
+    $sql_chat = "
+        SELECT m.message, m.sender_id, m.timestamp
+        FROM messages m
+        WHERE (m.sender_id = $current_user_id AND m.receiver_id = $selected_receiver_id)
+           OR (m.sender_id = $selected_receiver_id AND m.receiver_id = $current_user_id)
+        ORDER BY m.timestamp ASC
+    ";
+    $result_chat = $conn->query($sql_chat);
+    if ($result_chat) {
+        while ($row = $result_chat->fetch_assoc()) {
+            $chat_history[] = $row;
+        }
+    }
+
+    // Mark messages as read
+    $sql_mark_read = "UPDATE messages SET is_read = 1 WHERE sender_id = $selected_receiver_id AND receiver_id = $current_user_id AND is_read = 0";
+    $conn->query($sql_mark_read);
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -211,30 +292,32 @@ body {
 <div class="container">
     <div class="sidebar">
         <h2>Manufacturers</h2>
-        <div class="manufacturer">
-            <span>ABC Textiles</span>
-            <span class="unread">3</span>
+        <?php foreach ($sidebar_manufacturers as $man): ?>
+        <div class="manufacturer" onclick="window.location.href='?chat=<?php echo $man['user_id']; ?>'">
+            <span><?php echo htmlspecialchars($man['company_name']); ?></span>
+            <?php if ($man['unread'] > 0): ?>
+            <span class="unread"><?php echo $man['unread']; ?></span>
+            <?php endif; ?>
         </div>
-        <div class="manufacturer">
-            <span>XYZ Textiles</span>
-            <span class="unread">5</span>
-        </div>
+        <?php endforeach; ?>
     </div>
 
     <div class="chat-window">
         <div class="chat-history">
-            <div class="chat-message received">
-                <p>Hello, we need more details about the fabric.</p>
+            <?php foreach ($chat_history as $msg): ?>
+            <div class="chat-message <?php echo ($msg['sender_id'] == $current_user_id) ? 'sent' : 'received'; ?>">
+                <p><?php echo htmlspecialchars($msg['message']); ?></p>
             </div>
-            <div class="chat-message sent">
-                <p>Sure, I will send the specifications shortly.</p>
-            </div>
+            <?php endforeach; ?>
         </div>
 
-        <div class="message-input">
-            <input type="text" placeholder="Type your message...">
-            <button>Send</button>
-        </div>
+        <?php if ($selected_receiver_id > 0): ?>
+        <form class="message-input" method="POST">
+            <input type="hidden" name="receiver_id" value="<?php echo $selected_receiver_id; ?>">
+            <input type="text" name="message" placeholder="Type your message...">
+            <button type="submit">Send</button>
+        </form>
+        <?php endif; ?>
 
         <div class="voice-call">
             <button>
