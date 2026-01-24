@@ -224,23 +224,19 @@ $conn->close();
             box-shadow: 0 3px 14px rgba(180, 140, 60, 0.12);
             margin-bottom: 2.5rem;
         }
-
         th, td {
             padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid #f0e4d2;
         }
-
         th {
             background: #fdf8f0;
             color: #6d4c1e;
             font-weight: 600;
         }
-
         tr:hover {
             background: #fffaf0;
         }
-
         .actions button {
             padding: 7px 16px;
             border-radius: 12px;

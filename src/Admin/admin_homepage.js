@@ -29,7 +29,7 @@ const tents = [
     desc: "Moderate fabrics, forum posts & content",
     img: "../../assests/tent-samples.jpg",
    icon: "🛡️",
-    link: "content_moderation.php"
+    link: "moderation.php"
   },
   {
    key: "listings-moderation",
@@ -45,7 +45,7 @@ const tents = [
     desc: "Platform stats, reports & admin activity logs",
     img: "../../assests/tent-forum.jpg",
    icon: "📈",
-    link: "analytics_logs.php"
+    link: "dashboard.php"
   },
   {
     key: "settings",
@@ -53,7 +53,7 @@ const tents = [
     desc: "Configure your preferences",
     img: "../../assests/tent-settings.jpg",
     icon: "⚙️",
-    link: "setting_manufacturer.php"
+    link: "setting_admin.php"
   }
 ];
 

@@ -1,452 +1,488 @@
 <?php
 session_start();
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'wholesaler') {
+    header("Location: ../../login.php");
+    exit();
+}
+
+$wholesaler_id = $_SESSION['user_id'];
+
+$mysqli = new mysqli("localhost", "root", "", "bazaar_e_hind");
+$mysqli->set_charset("utf8mb4");
+
+/* =========================
+   HANDLE REQUEST + SIGN
+   ========================= */
+$message = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'request_exclusivity') {
+
+    $manufacturer_id = (int)$_POST['manufacturer_id'];
+    $start_date      = $_POST['start_date'];
+    $end_date        = $_POST['end_date'];
+    $terms           = trim($_POST['terms'] ?? '');
+    $signature       = $_POST['signature'] ?? '';
+    $fabric_ids      = $_POST['fabrics'] ?? [];
+
+    if (
+        !$manufacturer_id ||
+        !$start_date ||
+        !$end_date ||
+        empty($fabric_ids) ||
+        empty($signature)
+    ) {
+        $message = "All fields including digital signature are required.";
+    } else {
+
+        // Save signature
+        $sig = base64_decode(str_replace('data:image/png;base64,', '', $signature));
+        $dir = "../../uploads/signatures/";
+        if (!is_dir($dir)) mkdir($dir, 0777, true);
+
+        $path = $dir . "wholesaler_" . time() . ".png";
+        file_put_contents($path, $sig);
+
+        $fabric_json = json_encode(array_map('intval', $fabric_ids));
+
+        $stmt = $mysqli->prepare("
+            INSERT INTO exclusivity_agreements
+            (wholesaler_id, manufacturer_id, fabric_ids, start_date, end_date, terms,
+             status, wholesaler_signature, wholesaler_signed_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'pending_manufacturer', ?, NOW())
+        ");
+        $stmt->bind_param(
+            "iisssss",
+            $wholesaler_id,
+            $manufacturer_id,
+            $fabric_json,
+            $start_date,
+            $end_date,
+            $terms,
+            $path
+        );
+        $stmt->execute();
+        $stmt->close();
+
+        $message = "Exclusivity request sent to manufacturer.";
+    }
+}
+
+/* =========================
+   FETCH AGREEMENTS
+   ========================= */
+$agreements = $mysqli->query("
+    SELECT 
+        a.agreement_id,
+        a.start_date,
+        a.end_date,
+        a.status,
+        u.company_name AS manufacturer
+    FROM exclusivity_agreements a
+    JOIN users u ON u.user_id = a.manufacturer_id
+    WHERE a.wholesaler_id = $wholesaler_id
+    ORDER BY a.created_at DESC
+");
+
+/* =========================
+   MANUFACTURERS
+   ========================= */
+$manufacturers = $mysqli->query("
+    SELECT user_id, company_name
+    FROM users
+    WHERE role='manufacturer' AND account_status='active'
+    ORDER BY company_name
+");
+
+/* =========================
+   FABRICS (OWNED / AVAILABLE)
+   ========================= */
+$fabrics = $mysqli->query("
+    SELECT fabric_id, name
+    FROM fabrics
+    WHERE is_active = 1
+    ORDER BY name
+");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exclusivity Agreements</title>
+<link rel="stylesheet" href="../css_all_pages.css">
 
 <style>
-/* ===== FONT & BASE ===== */
-body {
-  font-family: 'Georgia', serif;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  color: #3e2723;
-  min-height: 100vh;
-}
-
-/* ===== BACKGROUND VIDEO ===== */
-#bg-video {
+/* === Modal === */
+.modal {
+  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  min-width: 100vw;
-  min-height: 100vh;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999 !important;
+}
+.modal-box {
+  background:#f6efe6;
+  width:850px;
+  max-width:95%;
+  margin:4% auto;
+  padding:30px;
+  border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+  font-family: Georgia, serif;
+
+  max-height: 85vh;        /* ✅ KEY */
+  overflow-y: auto;        /* ✅ KEY */
+}
+.modal-box h2 {
+  color:#6d4c1e;
+  margin-bottom:20px;
 }
 
-/* ===== HEADER ===== */
-.blue-header {
-  background-color: rgba(73, 40, 22, 0.389);
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  position: relative;
+.row {
+  display:flex;
+  gap:20px;
+  margin-bottom:16px;
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exclusivity Agreements</title>
-
-<style>
-/* ===== FONT & BASE ===== */
-body {
-  font-family: 'Georgia', serif;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  color: #3e2723;
-  min-height: 100vh;
+.field {
+  flex:1;
 }
 
-/* ===== BACKGROUND VIDEO ===== */
+label {
+  font-weight:600;
+  color:#5a3e1b;
+}
+
+select, input, textarea {
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1.5px solid #c9a24d;
+  background:#fff;
+}
+
+textarea { min-height:90px; }
+
+canvas {
+  width:100%;
+  height:180px;
+  border:2px dashed #c9a24d;
+  border-radius:10px;
+  background:#fff;
+}
+
+.actions {
+  display:flex;
+  gap:12px;
+  justify-content:flex-end;
+  margin-top:20px;
+}
+
+.btn {
+  padding:10px 22px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
+  font-size:1rem;
+}
+
+.btn.gold { background:#c9a24d; color:#fff; }
+.btn.gray { background:#aaa; color:#fff; }
+.btn.dark { background:#444; color:#fff; }
+
 #bg-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  min-width: 100vw;
-  min-height: 100vh;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
+  pointer-events: none !important;
+  z-index: -1 !important;
 }
 
-/* ===== HEADER ===== */
-.blue-header {
-  background-color: rgba(73, 40, 22, 0.389);
-  color: white;
-  padding: 1rem;
-  text-align: center;
+.header,
+.container,
+.list-section,
+.submit-btn,
+table {
   position: relative;
+  z-index: 10;
 }
-
-.blue-header .back-link {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  position: absolute;
-  left: 1rem;
-  top: 1rem;
-}
-
-/* ===== TABLE ===== */
-.agreements-table {
-  width: 90%;
-  max-width: 1200px;
-  margin: 2rem auto;
+table {
+  width: 100%;
   border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.92);
-  border-radius: 8px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
   overflow: hidden;
 }
 
-.agreements-table th,
-.agreements-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+th {
+  background: #e0c68c;
+  color: #5a3e1b;
+  padding: 12px;
 }
 
-.agreements-table th {
-  background-color: #e0c68c;
-  color: white;
+td {
+  padding: 12px;
+  border-top: 1px solid #eee;
 }
 
-.agreements-table tr:hover {
-  background-color: #f1f1f1;
+.list-section {
+  margin-top: 40px;
 }
 
-/* ===== STATUS BADGES ===== */
-.status-badge {
-  display: inline-block;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.status-pending  { background-color: #ffc107; color: #212529; }
-.status-active   { background-color: #28a745; color: white; }
-.status-rejected { background-color: #dc3545; color: white; }
-.status-expired  { background-color: #6c757d; color: white; }
-
-/* ===== ACTION BUTTONS ===== */
-.actions {
-  margin: 2rem auto;
-  text-align: center;
-}
-
-.actions button {
-  padding: 0.7rem 1.8rem;
-  border: none;
-  border-radius: 6px;
-  background-color: #c19c55;
-  color: white;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-family: inherit;
-  transition: background-color 0.2s;
-}
-
-.actions button:hover {
-  background-color: #a67c41;
-}
-
-.actions button::after {
-  content: " ₹";
-  font-weight: bold;
-}
-
-/* ===== MODAL FORM ===== */
-.form-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(224, 198, 140, 0.98);
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  z-index: 1000;
-  width: 90%;
-  max-width: 520px;
-}
-
-.form-container.active {
-  display: block;
-}
-
-.form-container h2 {
-  margin-top: 0;
-  color: #3e2723;
-}
-
-.form-container label {
-  display: block;
-  margin: 1rem 0 0.4rem;
-  font-weight: 500;
-}
-
-.form-container select,
-.form-container textarea {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #c19c55;
-  border-radius: 5px;
-  font-family: inherit;
-}
-
-.form-container textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.form-container button {
-  margin-top: 1.5rem;
-  background-color: #8b5e3c;
-}
-
-.form-container button:hover {
-  background-color: #6d4a30;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .agreements-table thead {
-    display: none;
-  }
-  .agreements-table tr {
-    display: block;
-    margin-bottom: 1.2rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 0.8rem;
-  }
-  .agreements-table td {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.6rem 1rem;
-  }
-  .agreements-table td::before {
-    content: attr(data-label);
-    font-weight: bold;
-    color: #5d4037;
-  }
-}
 </style>
 </head>
 
 <body>
 
-<!-- Background Video -->
 <video autoplay muted loop playsinline id="bg-video">
   <source src="../../assests/silk video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
 </video>
 
-<?php
-// Security - only-logged-in wholesalers
-if (!isset($_SESSION['logged_in']) || !in_array($_SESSION['role'], ['wholesaler', 'both'])) {
-    header("Location: ../login.html");
-    exit();
-}
-
-$wholesaler_id = $_SESSION['user_id'] ?? null;
-
-// Database connection (change credentials as per your setup)
-$host = "localhost";
-$user = "root";
-$pass = "";
-$dbname = "bazaar_e_hind";
-
-$conn = new mysqli($host, $user, $pass, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Handle new exclusivity request
-$message = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'request_exclusivity') {
-    $manufacturer_id = filter_input(INPUT_POST, 'manufacturer_id', FILTER_VALIDATE_INT);
-    $fabrics = isset($_POST['fabrics']) ? implode(", ", $_POST['fabrics']) : "";
-    $duration_from = trim($_POST['duration_from'] ?? '');
-    $duration_to   = trim($_POST['duration_to'] ?? '');
-    $terms = trim($_POST['terms'] ?? '');
-
-    if ($manufacturer_id && $fabrics && $duration_from && $duration_to) {
-        $stmt = $conn->prepare(
-            "INSERT INTO exclusivity_agreements 
-            (wholesaler_id, manufacturer_id, fabrics, duration_from, duration_to, terms, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())"
-        );
-
-        $stmt->bind_param("iissss", 
-            $wholesaler_id, 
-            $manufacturer_id, 
-            $fabrics, 
-            $duration_from, 
-            $duration_to, 
-            $terms
-        );
-
-        if ($stmt->execute()) {
-            $message = "Exclusivity request submitted successfully! Waiting for manufacturer approval.";
-        } else {
-            $message = "Error: " . $stmt->error;
-        }
-        $stmt->close();
-    } else {
-        $message = "Please fill all required fields.";
-    }
-}
-
-// Fetch existing agreements
-$agreements = [];
-$result = $conn->query("
-    SELECT 
-        ea.id AS agreement_id,
-        u.company_name AS manufacturer_name,
-        ea.fabrics,
-        DATE_FORMAT(ea.duration_from, '%d/%m/%Y') AS duration_from,
-        DATE_FORMAT(ea.duration_to, '%d/%m/%Y') AS duration_to,
-        ea.status
-    FROM exclusivity_agreements ea
-    JOIN users u ON ea.manufacturer_id = u.id
-    WHERE ea.wholesaler_id = $wholesaler_id
-    ORDER BY ea.created_at DESC
-");
-
-while ($row = $result->fetch_assoc()) {
-    $agreements[] = $row;
-}
-
-// Fetch available manufacturers (for dropdown)
-$manufacturers = [];
-$manuf_result = $conn->query("
-    SELECT id, company_name 
-    FROM users 
-    WHERE role IN ('manufacturer', 'both') 
-    AND account_status = 'active'
-    ORDER BY company_name
-");
-while ($m = $manuf_result->fetch_assoc()) {
-    $manufacturers[] = $m;
-}
-
-$conn->close();
-?>
-
-<header class="blue-header">
-  <a href="../home.php" class="back-link">← Home</a>
-  <h1>Exclusivity Agreements</h1>
-</header>
+<div class="header">
+  <a href="bazaar-homepage.php" class="back-link">← Home</a>
+  <div class="header-title">Exclusivity Agreements</div>
+</div>
 
 <div class="container">
+<div class="list-section">
 
-  <?php if ($message): ?>
-  <div style="text-align:center; margin:1.5rem; padding:1rem; background:#fff3cd; border:1px solid #ffeeba; border-radius:6px; color:#856404;">
-    <?= htmlspecialchars($message) ?>
-  </div>
-  <?php endif; ?>
+<?php if ($message): ?>
+<div class="msg success"><?= htmlspecialchars($message) ?></div>
+<?php endif; ?>
 
-  <table class="agreements-table">
-    <thead>
-      <tr>
-        <th>Agreement ID</th>
-        <th>Manufacturer</th>
-        <th>Fabrics</th>
-        <th>Duration</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if (empty($agreements)): ?>
-        <tr>
-          <td colspan="5" style="text-align:center; padding:2rem;">No exclusivity agreements found.</td>
-        </tr>
-      <?php else: ?>
-        <?php foreach ($agreements as $agr): ?>
-          <tr>
-            <td data-label="Agreement ID">EA<?= str_pad($agr['agreement_id'], 5, '0', STR_PAD_LEFT) ?></td>
-            <td data-label="Manufacturer"><?= htmlspecialchars($agr['manufacturer_name']) ?></td>
-            <td data-label="Fabrics"><?= htmlspecialchars($agr['fabrics']) ?></td>
-            <td data-label="Duration">
-              <?= $agr['duration_from'] ?> – <?= $agr['duration_to'] ?>
-            </td>
-            <td data-label="Status">
-              <span class="status-badge status-<?= $agr['status'] ?>">
-                <?= ucfirst($agr['status']) ?>
-              </span>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </tbody>
-  </table>
+<table>
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Manufacturer</th>
+  <th>Duration</th>
+  <th>Status</th>
+</tr>
+</thead>
+<tbody>
+<?php while($a = $agreements->fetch_assoc()): ?>
+<tr>
+  <td>EA<?= str_pad($a['agreement_id'],5,'0',STR_PAD_LEFT) ?></td>
+  <td><?= htmlspecialchars($a['manufacturer']) ?></td>
+  <td><?= date('d/m/Y',strtotime($a['start_date'])) ?> – <?= date('d/m/Y',strtotime($a['end_date'])) ?></td>
+  <td><span class="status <?= $a['status'] ?>"><?= ucwords(str_replace('_',' ',$a['status'])) ?></span></td>
+</tr>
+<?php endwhile; ?>
+</tbody>
+</table>
 
-  <div class="actions">
-    <button id="request-new">Request New Exclusivity</button>
-  </div>
+<div style="text-align:center;margin-top:30px;">
+<button
+  type="button"
+  class="submit-btn"
+  id="open-exclusivity-btn">
+  Request New Exclusivity ₹
+</button>
+</div>
 
-  <!-- New Request Modal -->
-  <div class="form-container" id="exclusivity-form">
+</div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<!-- ================= MODAL ================= -->
+<div class="modal" id="exclusivityModal">
+  <div class="modal-box">
+
     <h2>Request New Exclusivity</h2>
 
-    <form method="POST" action="">
+    <form method="POST">
       <input type="hidden" name="action" value="request_exclusivity">
 
-      <label>Select Manufacturer *</label>
-      <select name="manufacturer_id" required>
-        <option value="">-- Select Manufacturer --</option>
-        <?php foreach ($manufacturers as $m): ?>
-          <option value="<?= $m['id'] ?>"><?= htmlspecialchars($m['company_name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <!-- ROW 1 -->
+      <div class="row">
+        <div class="field">
+          <label>Manufacturer *</label>
+          <select name="manufacturer_id" id="manufacturer-select" required>
+  <option value="">Select manufacturer</option>
+  <?php while ($m = $manufacturers->fetch_assoc()): ?>
+    <option value="<?= $m['user_id'] ?>">
+      <?= htmlspecialchars($m['company_name']) ?>
+    </option>
+  <?php endwhile; ?>
+</select>
+        </div>
 
-      <label>Desired Fabrics (select multiple) *</label>
-      <select name="fabrics[]" multiple required size="6">
-        <option value="Silk Saffron">Silk Saffron</option>
-        <option value="Cotton Blue">Cotton Blue</option>
-        <option value="Linen Gold">Linen Gold</option>
-        <option value="Velvet Red">Velvet Red</option>
-        <option value="Polyester Blend">Polyester Blend</option>
-        <!-- You can also fetch this dynamically from fabrics table -->
-      </select>
-
-      <label>Proposed Duration *</label>
-      <div style="display:flex; gap:1rem;">
-        <input type="date" name="duration_from" required>
-        <span style="align-self:center;">to</span>
-        <input type="date" name="duration_to" required>
+        <div class="field">
+          <label>Fabrics *</label>
+          <select name="fabrics[]" id="fabrics-select" multiple required>
+            <option value="">Select manufacturer first</option>
+          </select>
+        </div>
       </div>
 
-      <label>Terms & Conditions / Special Requests</label>
-      <textarea name="terms" placeholder="Any additional terms, conditions or notes..."></textarea>
+      <!-- ROW 2 -->
+      <div class="row">
+        <div class="field">
+          <label>Start Date *</label>
+          <input type="date" name="start_date" required>
+        </div>
+        <div class="field">
+          <label>End Date *</label>
+          <input type="date" name="end_date" required>
+        </div>
+      </div>
 
-      <button type="submit" id="submit-request">Submit Request</button>
+      <!-- TERMS -->
+      <div class="field">
+        <label>Terms & Conditions</label>
+        <textarea name="terms"></textarea>
+      </div>
+
+      <!-- SIGNATURE -->
+      <div class="field">
+        <label>Digital Signature *</label>
+        <canvas id="signature-pad"></canvas>
+        <input type="hidden" name="signature" id="signature">
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        
+       <button type="button" class="btn gray" onclick="clearSignature()">
+  Clear
+</button>
+
+<button type="submit" class="btn gold">
+  Submit Request
+</button>
+
+<button type="button" class="btn dark" onclick="document.getElementById('exclusivityModal').style.display='none'">
+  Cancel
+</button>
+
+      </div>
+
     </form>
   </div>
 </div>
 
-<footer style="background:rgba(255,255,255,0.92);text-align:center;padding:1.5rem; color:#5d4037; margin-top:3rem;">
-  © <?= date("Y") ?> Bazaar-e-Hind. All rights reserved.
-</footer>
-
 <script>
-document.getElementById('request-new').onclick = function() {
-  document.getElementById('exclusivity-form').classList.add('active');
-};
+document.addEventListener("DOMContentLoaded", function () {
 
-document.getElementById('submit-request').onclick = function(e) {
-  // Optional: can add client-side validation here if needed
-  // e.preventDefault(); // uncomment if you want AJAX instead
+  /* ================= MODAL ================= */
+  const modal   = document.getElementById("exclusivityModal");
+  const openBtn = document.getElementById("open-exclusivity-btn");
+
+  openBtn.addEventListener("click", function () {
+    modal.style.display = "block";
+    setTimeout(initCanvas, 100); // init AFTER visible
+  });
+
+  window.addEventListener("click", function (e) {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+
+  /* ================= SIGNATURE ================= */
+  let canvas, ctx, drawing = false;
+
+  function initCanvas() {
+    canvas = document.getElementById("signature-pad");
+    ctx = canvas.getContext("2d");
+
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width;
+    canvas.height = rect.height;
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#6d4c1e";
+
+    canvas.onmousedown = e => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    };
+
+    canvas.onmousemove = e => {
+      if (!drawing) return;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    };
+
+    canvas.onmouseup = endDraw;
+    canvas.onmouseleave = endDraw;
+
+    canvas.ontouchstart = e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      const r = canvas.getBoundingClientRect();
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(t.clientX - r.left, t.clientY - r.top);
+    };
+
+    canvas.ontouchmove = e => {
+  e.preventDefault();
+  if (!drawing) return;
+
+  const t = e.touches[0];
+  const r = canvas.getBoundingClientRect();
+  const x = t.clientX - r.left;
+  const y = t.clientY - r.top;
+
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.beginPath();       // 👈 CRITICAL
+  ctx.moveTo(x, y);      // 👈 CRITICAL
 };
+    canvas.ontouchend = endDraw;
+  }
+
+  function endDraw() {
+    if (!drawing) return;
+    drawing = false;
+    document.getElementById("signature").value =
+      canvas.toDataURL("image/png");
+  }
+
+  window.clearSignature = function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById("signature").value = "";
+  };
+
+  /* ================= FABRICS AJAX ================= */
+  document
+    .getElementById("manufacturer-select")
+    .addEventListener("change", function () {
+
+      const manufacturerId = this.value;
+      const fabricSelect = document.getElementById("fabrics-select");
+
+      fabricSelect.innerHTML = "<option>Loading…</option>";
+
+      if (!manufacturerId) {
+        fabricSelect.innerHTML = "<option>Select manufacturer first</option>";
+        return;
+      }
+
+      fetch("ajax_get_fabrics.php?manufacturer_id=" + manufacturerId)
+        .then(r => r.json())
+        .then(data => {
+          fabricSelect.innerHTML = "";
+          if (!data.length) {
+            fabricSelect.innerHTML = "<option>No fabrics available</option>";
+            return;
+          }
+          data.forEach(f => {
+            const opt = document.createElement("option");
+            opt.value = f.fabric_id;
+            opt.textContent = f.name;
+            fabricSelect.appendChild(opt);
+          });
+        })
+        .catch(() => {
+          fabricSelect.innerHTML = "<option>Error loading fabrics</option>";
+        });
+    });
+
+});
 </script>
 
 </body>
 </html>
+
+<?php $mysqli->close(); ?>
