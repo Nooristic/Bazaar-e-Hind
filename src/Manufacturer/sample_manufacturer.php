@@ -101,24 +101,118 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css_all_pages.css">
   <style>
-    /* Page-specific sample management styles; global header/body/bg-video/footer live in css_all_pages.css */
-    .sample-container{flex:1;padding:32px 32px 24px;display:flex;flex-direction:column;min-width:0}
-    .responsive-table{width:100%;display:flex;flex-direction:column;gap:16px;overflow-x:auto}
-    .table-row,.table-header{display:flex;align-items:stretch;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(180,140,60,.05);border:1.5px solid var(--border);min-width:900px}
-    .table-header{background:#fffbe6;font-weight:bold;color:#6d4c1e;font-size:1.05rem;border-bottom:2px solid var(--border)}
-    .table-cell{flex:1 1 0;padding:14px 10px;display:flex;align-items:center;min-width:110px;box-sizing:border-box;font-size:1rem;word-break:break-word}
-    .table-cell.actions{gap:8px;flex-wrap:wrap}
-    .action-btn{background:var(--btn);color:#6d4c1e;border:1.5px solid var(--border);border-radius:7px;padding:6px 14px;font-size:1rem;cursor:pointer;transition:background .15s,border .15s}
-    .action-btn:hover{background:var(--btn-hover);border-color:var(--primary)}
-    .dispatch-fields{display:flex;flex-direction:column;gap:6px;margin-top:8px;font-size:.97rem}
-    .dispatch-fields input{padding:8px 10px;border-radius:6px;border:1.2px solid var(--border);background:#fffbe6;font-size:.95rem}
-    footer{background:#fffbe6;border-top:2px solid var(--border);padding:16px 0 12px;text-align:center;margin-top:auto}
-    .footer-links{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
-    .footer-links a{color:#6d4c1e;text-decoration:none;font-weight:500;transition:color .15s}
-    .footer-links a:hover{color:var(--primary)}
-    @media(max-width:1050px){.sample-container{padding:18px 2vw}.table-row,.table-header{min-width:700px}}
-    @media(max-width:700px){.table-row,.table-header{flex-direction:column;min-width:0}.table-cell{padding:10px 8px;border-bottom:1px solid #f5ebe3}}
-  </style>
+  .sample-container {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.responsive-table {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-x: auto;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 120px 1.5fr 1.2fr 120px 1.5fr 140px 260px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,.04);
+}
+
+.table-header {
+  background: #fff6dc;
+  font-weight: 600;
+  color: #6d4c1e;
+}
+
+.table-cell {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  font-size: .95rem;
+}
+
+.table-cell.actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Status pills */
+.status-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: .85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-requested { background:#fff1c1; color:#8a6d1d; }
+.status-accepted  { background:#e8f5e9; color:#2e7d32; }
+.status-rejected  { background:#fdecea; color:#c62828; }
+.status-shipped   { background:#e3f2fd; color:#1565c0; }
+.status-delivered { background:#ede7f6; color:#4527a0; }
+
+/* Buttons */
+.action-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--btn);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all .15s ease;
+}
+
+.action-btn:hover {
+  background: var(--btn-hover);
+  transform: translateY(-1px);
+}
+
+/* Dispatch panel */
+.dispatch-fields {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff8e8;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+}
+
+.dispatch-fields input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: .9rem;
+}
+
+/* Mobile */
+@media (max-width: 1100px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    display: none;
+  }
+
+  .table-cell {
+    padding: 10px 14px;
+  }
+
+  .table-row {
+    gap: 6px;
+  }
+}
+</style>
 </head>
 <body>
   <video autoplay muted loop id="bg-video">
@@ -154,15 +248,12 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
           <div class="table-cell"><?= htmlspecialchars($req['fabric_name']) ?></div>
           <div class="table-cell"><?= number_format($req['quantity'], 2) ?> m</div>
           <div class="table-cell"><?= htmlspecialchars($req['notes'] ?? '—') ?></div>
-          <div class="table-cell status">
-            <select disabled>
-              <option <?= $req['status']=='requested'?'selected':'' ?>>Requested</option>
-              <option <?= $req['status']=='accepted'?'selected':'' ?>>Accepted</option>
-              <option <?= $req['status']=='rejected'?'selected':'' ?>>Rejected</option>
-              <option <?= $req['status']=='shipped'?'selected':'' ?>>Shipped</option>
-              <option <?= $req['status']=='delivered'?'selected':'' ?>>Delivered</option>
-            </select>
-          </div>
+          <div class="table-cell">
+  <span class="status-pill status-<?= $req['status'] ?>">
+    <?= ucfirst($req['status']) ?>
+  </span>
+</div>
+
           <div class="table-cell actions">
             <?php if ($req['status'] === 'requested'): ?>
               <form method="POST" style="display:inline;">
@@ -179,7 +270,9 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
             <?php endif; ?>
 
             <?php if (in_array($req['status'], ['accepted','shipped'])): ?>
-              <button type="button" class="action-btn dispatch-toggle" onclick="toggleDispatch(this)">Dispatch</button>
+             <button type="button" class="action-btn" onclick="toggleDispatch(this)">
+              Dispatch
+              </button>
               <form method="POST" class="dispatch-fields" style="display:none;">
                 <input type="hidden" name="request_id" value="<?= $req['sample_id'] ?>">
                 <input type="hidden" name="action" value="dispatch">
@@ -201,12 +294,13 @@ $requests = $result->fetch_all(MYSQLI_ASSOC);
 
   <script>
     function toggleDispatch(btn) {
-      const form = btn.nextElementSibling;
-      if (form && form.classList.contains('dispatch-fields')) {
-        form.style.display = (form.style.display === 'none' || !form.style.display) ? 'flex' : 'none';
-        btn.textContent = form.style.display === 'none' ? 'Dispatch' : 'Hide';
-      }
-    }
+  const panel = btn.nextElementSibling;
+  const open = panel.style.display === 'flex';
+
+  panel.style.display = open ? 'none' : 'flex';
+  btn.textContent = open ? 'Dispatch' : 'Hide Dispatch';
+}
+
   </script>
 </body>
 </html>

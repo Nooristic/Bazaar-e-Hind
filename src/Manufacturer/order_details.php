@@ -21,14 +21,25 @@ if ($order_id <= 0) {
 }
 
 // Fetch order + wholesaler + shipping address
-$sql = "SELECT o.*, 
-               u.company_name, u.name AS contact_person, u.phone, u.email,
-               a.address_line, a.city, a.state, a.zip_code, a.country
-        FROM orders o
-        LEFT JOIN users u ON o.wholesaler_id = u.user_id
-        LEFT JOIN addresses a ON o.shipping_address_id = a.address_id
-        WHERE o.order_id = ? AND o.manufacturer_id = ?";
-
+$sql = "
+    SELECT 
+        o.*,
+        u.company_name AS wholesaler_company,
+        u.contact_no AS wholesaler_phone,
+        u.email AS wholesaler_email,
+        a.address_line,
+        a.city,
+        a.state,
+        a.zip_code,
+        a.country
+    FROM orders o
+    LEFT JOIN users u 
+        ON o.wholesaler_id = u.user_id
+    LEFT JOIN addresses a 
+        ON o.shipping_address_id = a.address_id
+    WHERE o.order_id = ?
+      AND o.manufacturer_id = ?
+";
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("ii", $order_id, $manufacturer_id);
 $stmt->execute();
@@ -41,9 +52,14 @@ if (!$order) {
 
 // Fetch order items with fabric details
 $items_stmt = $mysqli->prepare("
-    SELECT oi.quantity, oi.price_at_purchase, f.fabric_name, f.image_path
+    SELECT 
+        oi.quantity, 
+        oi.price_at_purchase, 
+        f.name AS fabric_name,
+        f.image_urls
     FROM order_items oi
-    JOIN fabrics f ON oi.fabric_id = f.fabric_id
+    JOIN fabrics f 
+        ON oi.fabric_id = f.fabric_id
     WHERE oi.order_id = ?
 ");
 $items_stmt->bind_param("i", $order_id);
@@ -116,10 +132,11 @@ td{padding:12px;vertical-align:middle}
   <hr style="border:1px dashed var(--border);margin:25px 0">
 
   <h2>Wholesaler</h2>
-  <p><strong><?= htmlspecialchars($order['company_name'] ?? $order['contact_person'] ?? 'N/A') ?></strong><br>
-     Phone: <?= htmlspecialchars($order['phone'] ?? '—') ?> |
-     Email: <?= htmlspecialchars($order['email'] ?? '—') ?></p>
-
+  <p>
+  <strong><?= htmlspecialchars($order['wholesaler_company'] ?? 'N/A') ?></strong><br>
+  Phone: <?= htmlspecialchars($order['wholesaler_phone'] ?? '—') ?> |
+  Email: <?= htmlspecialchars($order['wholesaler_email'] ?? '—') ?>
+</p>
   <h2>Shipping Address</h2>
   <p><?= nl2br(htmlspecialchars($order['address_line'] . "\n" . $order['city'] . ", " . $order['state'] . " " . $order['zip_code'] . "\n" . ($order['country'] ?? 'India'))) ?></p>
 
@@ -136,8 +153,19 @@ td{padding:12px;vertical-align:middle}
         $grand_qty += $item['quantity'];
       ?>
         <tr>
-          <td><img src="../../<?= htmlspecialchars($item['image_path'] ?? 'assets/placeholder.jpg') ?>" class="item-img" alt="Fabric"></td>
-          <td><strong><?= htmlspecialchars($item['fabric_name']) ?></strong></td>
+          <?php
+$images = json_decode($item['image_urls'], true);
+$image = is_array($images) && !empty($images)
+    ? $images[0]
+    : 'assets/placeholder.jpg';
+?>
+<td>
+  <img src="../../<?= htmlspecialchars($image) ?>" class="item-img" alt="Fabric">
+</td>
+<td>
+  <strong><?= htmlspecialchars($item['fabric_name']) ?></strong>
+</td>
+
           <td><?= number_format($item['quantity']) ?> pcs</td>
           <td>₹<?= number_format($item['price_at_purchase'], 0) ?></td>
           <td>₹<?= number_format($line_total, 0) ?></td>

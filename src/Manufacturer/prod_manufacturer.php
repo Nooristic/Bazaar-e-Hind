@@ -116,7 +116,7 @@ $mysqli->close();
 
 <!-- background video -->
 <video autoplay muted loop playsinline id="bg-video">
-    <source src="../../assests/silk video.mp4" type="video/mp4">
+    <source src="/trial_project/assests/silk video.mp4" type="video/mp4">
 </video>
 <div class="header">
     <a href="bazaar-homepage.php" class="back-link">← Home</a>

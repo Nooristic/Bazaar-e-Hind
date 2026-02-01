@@ -61,7 +61,7 @@ const tents = [
     desc: "Manage payments and transactions",
     img: "../../assests/tent-orders.jpg",
     icon: "💳",
-    link: "payment_manufacturer.html"
+    link: "payment_manufacturer.php"
   }
 ];
 

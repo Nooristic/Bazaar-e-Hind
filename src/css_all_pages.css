@@ -67,6 +67,13 @@ body{margin:0;font-family:'Georgia',serif;background:transparent;color:var(--tex
   font-weight: bold;
   color: #6d4c1e !important;           /* Keeps the same brown even when active */
 }
+.cart-link{ position:absolute;
+       right:24px;
+       top:20px;
+       text-decoration:none;
+       font-weight:bold;
+       color:#6d4c1e;
+       font-size:1.1rem;}
 @media(max-width:900px){.main-content{flex-direction:column;padding:18px 4vw;gap:18px}.sidebar{width:100%}}
 /* Common footer used across pages */
 footer{background:#fffbe6;border-top:2px solid var(--border);padding:16px;text-align:center;margin-top:auto}

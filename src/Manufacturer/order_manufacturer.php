@@ -151,7 +151,39 @@ $result = $stmt->get_result();
                     <?= ucwords(str_replace('_', ' ', $row['status'])) ?>
                   </span>
                 </td>
-                <td><a href="order_details.php?id=<?= $row['order_id'] ?>" class="view-btn">View</a></td>
+                <td style="white-space:nowrap">
+
+  <a href="order_details.php?id=<?= $row['order_id'] ?>" class="view-btn">
+    View
+  </a>
+
+  <?php if ($row['status'] === 'ordered'): ?>
+    <form method="post"
+          action="confirm_order.php"
+          style="display:inline">
+      <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
+      <button type="submit"
+              style="margin-left:6px;padding:4px 10px;border-radius:10px;
+                     background:#28a745;color:white;border:none;cursor:pointer">
+        Confirm
+      </button>
+    </form>
+
+    <form method="post"
+          action="reject_order.php"
+          style="display:inline"
+          onsubmit="return confirm('Reject this order?');">
+      <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
+      <button type="submit"
+              style="margin-left:6px;padding:4px 10px;border-radius:10px;
+                     background:#dc3545;color:white;border:none;cursor:pointer">
+        Reject
+      </button>
+    </form>
+  <?php endif; ?>
+
+</td>
+
               </tr>
             <?php endwhile; ?>
           <?php else: ?>

@@ -148,7 +148,7 @@ $agreements = $mysqli->query("
                 View Agreement
               </a>
 
-              <a href="download_agreement.php?id=<?= (int)$a['agreement_id'] ?>" class="submit-btn">
+              <a href="/trial_project/src/download_agreement.php?id=<?= (int)$a['agreement_id'] ?>" class="submit-btn">
                 Download
               </a>
             </td>

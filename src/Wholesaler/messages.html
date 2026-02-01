@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat & Call</title>
+    <base href="../../src/Wholesaler/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css_all_pages.css">
+  <style>
+.chat-main{
+  display:flex;
+  margin:24px 3vw 0 3vw;
+  height:80vh;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 2px 14px rgba(180,140,60,.08);
+}
+
+/* Sidebar */
+.chat-sidebar{
+  width:240px;
+  background:rgba(255,245,235,.92);
+  border-right:2px solid var(--border);
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-header{
+  font-weight:bold;
+  font-size:1.1rem;
+  padding:18px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+}
+
+.conversation-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.conversation-list li{
+  padding:16px 18px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background .15s;
+}
+
+.conversation-list li.active,
+.conversation-list li:hover{
+  background:var(--tab-active);
+  font-weight:bold;
+}
+
+/* Chat content */
+.chat-content{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  background:rgba(255,245,235,.92);
+}
+
+.chat-topbar{
+  padding:18px 28px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.chat-title{
+  font-size:1.5rem;
+  font-weight:bold;
+}
+
+.chat-actions{
+  display:flex;
+  gap:16px;
+}
+
+.chat-action-btn{
+  background:var(--tab-inactive);
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:6px 12px;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.chat-action-btn:hover{
+  background:var(--tab-active);
+  border-color:var(--primary);
+}
+
+.messages-area{
+  flex:1;
+  padding:24px 28px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.message-row{
+  display:flex;
+}
+
+.message-row.sent{
+  justify-content:flex-end;
+}
+
+.message-bubble{
+  max-width:60%;
+  padding:12px 18px;
+  border-radius:18px;
+  background:var(--tab-inactive);
+}
+
+.message-row.sent .message-bubble{
+  background:var(--tab-active);
+}
+
+/* Input */
+.chat-input-area{
+  display:flex;
+  padding:18px 28px;
+  border-top:1px solid var(--border);
+}
+
+.chat-input{
+  flex:1;
+  padding:12px 18px;
+  border-radius:22px;
+  border:2px solid var(--border);
+  font-size:1rem;
+}
+
+.send-btn{
+  margin-left:12px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:var(--tab-active);
+  border:2px solid var(--border);
+  cursor:pointer;
+}
+
+/* Mobile */
+@media(max-width:900px){
+  .chat-main{
+    flex-direction:column;
+    height:85vh;
+  }
+
+  .chat-sidebar{
+    width:100%;
+    border-right:none;
+    border-bottom:2px solid var(--border);
+  }
+}
+
+</style>
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="../../assests/silk video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="header">
+    <a href="home_page.php" class="back-link">← Home</a>
+    <span class="header-title">Chat & Call</span>
+    <div class="profile-btn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M12 14c-5 0-8 2.5-8 5v1h16v-1c0-2.5-3-5-8-5z"/></svg>
+    </div>
+  </div>
+  <div class="chat-main">
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        Conversation
+        <span class="dots">&#8942;</span>
+      </div>
+      <ul class="conversation-list">
+        <li>Silk &amp; Saffron</li>
+        <li class="active">Raj Trader</li>
+        <li>O.K.C Creation</li>
+      </ul>
+    </div>
+    <div class="chat-content">
+      <div class="chat-topbar">
+        <span class="chat-title">Raj Traders</span>
+        <div class="chat-actions">
+          <button class="chat-action-btn" title="Voice Call">
+            <svg viewBox="0 0 24 24">
+              <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 22 2 13.93 2 4.5A1 1 0 013 3.5h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z" fill="none" stroke="#b88c2b" stroke-width="2"/>
+            </svg>
+            <span style="font-size:0.85rem;">Voice</span>
+          </button>
+          <button class="chat-action-btn" title="Video Call">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="7" width="13" height="10" rx="2" fill="none" stroke="#b88c2b" stroke-width="2"/>
+              <polygon points="16 9 21 7 21 17 16 15" fill="none" stroke="#b88c2b" stroke-width="2"/>
+            </svg>
+            <span style="font-size:0.85rem;">Video</span>
+          </button>
+        </div>
+      </div>
+      <div class="messages-area">
+        <div class="message-row">
+          <div class="message-bubble">Hello, do you have the new silk rolls in stock?</div>
+        </div>
+        <div class="message-row sent">
+          <div class="message-bubble">Yes, we just received a fresh batch today!</div>
+        </div>
+        <div class="message-row">
+          <div class="message-bubble">Great! Can you share the price and MOQ?</div>
+        </div>
+      </div>
+      <form class="chat-input-area" onsubmit="return false;">
+        <input class="chat-input" type="text" placeholder="Enter message" />
+        <button class="send-btn" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24">
+            <path d="M2 21l21-9-21-9v7l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

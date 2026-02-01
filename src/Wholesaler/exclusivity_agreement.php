@@ -5,7 +5,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'wholesaler') {
     header("Location: ../../login.php");
     exit();
 }
-
 $wholesaler_id = $_SESSION['user_id'];
 
 $mysqli = new mysqli("localhost", "root", "", "bazaar_e_hind");
@@ -37,10 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'reque
 
         // Save signature
         $sig = base64_decode(str_replace('data:image/png;base64,', '', $signature));
-        $dir = "../../uploads/signatures/";
-        if (!is_dir($dir)) mkdir($dir, 0777, true);
+       $dir = $_SERVER['DOCUMENT_ROOT'] . "/trial_project/uploads/signatures/";
+if (!is_dir($dir)) mkdir($dir, 0777, true);
 
-        $path = $dir . "wholesaler_" . time() . ".png";
+$path = $dir . "wholesaler_" . time() . ".png";
+
         file_put_contents($path, $sig);
 
         $fabric_json = json_encode(array_map('intval', $fabric_ids));
@@ -236,7 +236,7 @@ td {
 </video>
 
 <div class="header">
-  <a href="bazaar-homepage.php" class="back-link">← Home</a>
+  <a href="home_page.php" class="back-link">← Home</a>
   <div class="header-title">Exclusivity Agreements</div>
 </div>
 
@@ -254,15 +254,37 @@ td {
   <th>Manufacturer</th>
   <th>Duration</th>
   <th>Status</th>
+  <th>Action</th>
 </tr>
 </thead>
 <tbody>
 <?php while($a = $agreements->fetch_assoc()): ?>
 <tr>
   <td>EA<?= str_pad($a['agreement_id'],5,'0',STR_PAD_LEFT) ?></td>
+
   <td><?= htmlspecialchars($a['manufacturer']) ?></td>
-  <td><?= date('d/m/Y',strtotime($a['start_date'])) ?> – <?= date('d/m/Y',strtotime($a['end_date'])) ?></td>
-  <td><span class="status <?= $a['status'] ?>"><?= ucwords(str_replace('_',' ',$a['status'])) ?></span></td>
+
+  <td>
+    <?= date('d/m/Y',strtotime($a['start_date'])) ?>
+    –
+    <?= date('d/m/Y',strtotime($a['end_date'])) ?>
+  </td>
+
+  <td>
+    <span class="status <?= $a['status'] ?>">
+      <?= ucwords(str_replace('_',' ',$a['status'])) ?>
+    </span>
+  </td>
+
+  <td>
+    <a
+      href="/trial_project/src/download_agreement.php?id=<?= (int)$a['agreement_id'] ?>"
+      class="submit-btn"
+      style="padding:6px 14px;"
+    >
+      Download
+    </a>
+  </td>
 </tr>
 <?php endwhile; ?>
 </tbody>

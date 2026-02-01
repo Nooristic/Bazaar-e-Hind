@@ -283,7 +283,7 @@ $conn->close();
     </video>
 
     <header class="blue-header">
-        <a href="../login.html" class="back-link">← Home</a>
+        <a href="home_page.php" class="back-link">← Home</a>
         <h1>Settings</h1>
     </header>
 

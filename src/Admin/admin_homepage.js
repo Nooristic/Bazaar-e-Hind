@@ -39,14 +39,7 @@ const tents = [
     icon: "🧵",
     link: "listings.php"
   },
-  {
-   key: "analytics-logs",
-    label: "Analytics & Audit Logs",
-    desc: "Platform stats, reports & admin activity logs",
-    img: "../../assests/tent-forum.jpg",
-   icon: "📈",
-    link: "dashboard.php"
-  },
+  
   {
     key: "settings",
     label: "Settings",

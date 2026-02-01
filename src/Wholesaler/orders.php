@@ -30,10 +30,13 @@ $sql = "
         u.company_name AS manufacturer_name,
         COUNT(oi.item_id) AS item_count,
         o.total_amount,
-        o.status
+        o.status,
+        i.invoice_id,
+        i.status AS invoice_status
     FROM orders o
     JOIN users u ON o.manufacturer_id = u.user_id
     LEFT JOIN order_items oi ON o.order_id = oi.order_id
+    LEFT JOIN invoices i ON i.order_id = o.order_id
     WHERE o.wholesaler_id = ?
     GROUP BY o.order_id
     ORDER BY o.order_date DESC
@@ -48,6 +51,28 @@ $orders = [];
 while ($row = $result->fetch_assoc()) {
     $orders[] = $row;
 }
+/* ================= DASHBOARD METRICS ================= */
+$total_orders = count($orders);
+
+$manufacturers = [];
+$accepted_orders = 0;
+$rejected_orders = 0;
+
+foreach ($orders as $o) {
+    $manufacturers[$o['manufacturer_name']] = true;
+
+    $status = strtolower($o['status']);
+
+    if (in_array($status, ['confirmed', 'in_production', 'dispatched', 'delivered'])) {
+        $accepted_orders++;
+    }
+
+    if (in_array($status, ['rejected', 'cancelled'])) {
+        $rejected_orders++;
+    }
+}
+
+$total_manufacturers = count($manufacturers);
 
 $stmt->close();
 $conn->close();
@@ -85,22 +110,31 @@ body {
 
 /* ===== HEADER ===== */
 .blue-header {
-  background-color: rgba(90, 30, 15, 0.379);
-  color: white;
-  padding: 1rem;
+  background: rgba(255, 245, 235, 0.96); /* beige */
+  color: #512d1a;
+  padding: 1.4rem 1rem;
   text-align: center;
   position: relative;
+  border-bottom: 2px solid #e0c68c;
 }
 
+.blue-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  letter-spacing: 0.5px;
+}
+
+.status-in_production { background-color: #007bff; }
 .blue-header .back-link {
-  color: white;
+  color: #512d1a;
   text-decoration: none;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
   position: absolute;
-  left: 1rem;
-  top: 1rem;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
-
 /* ===== TABLE ===== */
 .orders-table {
   width: 95%;
@@ -172,6 +206,50 @@ footer {
   padding: 1rem;
   margin-top: 2rem;
 }
+.view-invoice {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #512d1a;
+  color: rgb(226, 189, 164);
+  border-radius: 4px;
+  text-decoration: none;
+}
+/* ===== DASHBOARD ===== */
+.dashboard {
+  max-width: 95%;
+  margin: 1.8rem auto 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.dashboard-card {
+  background: rgba(255,255,255,0.92);
+  border-radius: 14px;
+  padding: 1.4rem;
+  text-align: center;
+  border: 2px solid #e0c68c;
+  box-shadow: 0 10px 26px rgba(0,0,0,.06);
+}
+
+.dashboard-card h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #512d1a;
+}
+
+.dashboard-card p {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: .3px;
+}
+
+.dashboard-card.accepted h2 { color: #2e7d32; }
+.dashboard-card.rejected h2 { color: #c62828; }
+.status-in_production { background-color: #0d6efd; }
+.status-cancelled { background-color: #9e9e9e; }
+.status-rejected { background-color: #c62828; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -208,10 +286,32 @@ footer {
 </video>
 
 <header class="blue-header">
-  <a href="../login.html" class="back-link">← Home</a>
+  <a href="home_page.php" class="back-link">← Home</a>
   <h1>Orders</h1>
 </header>
+<section class="dashboard">
 
+  <div class="dashboard-card">
+    <h2><?= $total_orders ?></h2>
+    <p>Orders Placed</p>
+  </div>
+
+  <div class="dashboard-card">
+    <h2><?= $total_manufacturers ?></h2>
+    <p>Manufacturers</p>
+  </div>
+
+  <div class="dashboard-card accepted">
+    <h2><?= $accepted_orders ?></h2>
+    <p>Accepted Orders</p>
+  </div>
+
+  <div class="dashboard-card rejected">
+    <h2><?= $rejected_orders ?></h2>
+    <p>Rejected Orders</p>
+  </div>
+
+</section>
 <table class="orders-table">
   <thead>
     <tr>
@@ -245,25 +345,37 @@ footer {
               $status = strtolower($order['status']);
               $class = 'status-' . $status;
               // You can map more status values if needed
-              $displayStatus = ucfirst($status);
+             $displayStatus = ucwords(str_replace('_', ' ', $status));
             ?>
             <span class="status-badge <?php echo $class; ?>">
               <?php echo $displayStatus; ?>
             </span>
           </td>
           <td data-label="Actions" class="actions">
-            <button class="view-invoice" 
-                    onclick="window.location.href='view_invoice.php?order_id=<?php echo $order['order_id']; ?>'">
-              View Invoice
-            </button>
 
-            <?php if ($status === 'ordered' || $status === 'confirmed'): ?>
-              <button class="pay-remaining"
-                      onclick="window.location.href='payment.php?order_id=<?php echo $order['order_id']; ?>'">
-                Pay Remaining
-              </button>
-            <?php endif; ?>
-          </td>
+  <?php if (!empty($order['invoice_id'])): ?>
+    <a class="view-invoice"
+       href="view_invoice.php?invoice_id=<?php echo $order['invoice_id']; ?>">
+      View Invoice
+    </a>
+  <?php endif; ?>
+
+  <?php
+    $status = strtolower($order['status']);
+    $canPay = in_array($status, [
+        'confirmed',
+        'in_production',
+        'dispatched'
+    ]);
+
+    if ($canPay && $order['invoice_status'] !== 'paid'):
+  ?>
+    <button class="pay-remaining"
+            onclick="window.location.href='payment.php?invoice_id=<?php echo $order['invoice_id']; ?>'">
+      Pay Remaining
+    </button>
+  <?php endif; ?>
+</td>
         </tr>
       <?php endforeach; ?>
     <?php endif; ?>

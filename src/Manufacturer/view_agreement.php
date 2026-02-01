@@ -30,9 +30,10 @@ if (!$agreement) {
     die("Unauthorized access");
 }
 $status = strtolower(trim($agreement['status']));
+$action = $_POST['action'] ?? null;
 /* ================= REJECT (DELETE) ================= */
-if ($_POST['action'] === 'reject') {
-    if ($status !== 'pending_wholesaler') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'reject') {
+    if ($status !== 'pending_manufacturer') {
         die("Invalid action");
     }
 
@@ -48,8 +49,8 @@ if ($_POST['action'] === 'reject') {
     exit();
 }
 /* ================= ACCEPT & SIGN ================= */
-if ($_POST['action'] === 'accept') {
-    if ($status !== 'pending_wholesaler') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'accept') {
+    if ($status !== 'pending_manufacturer') {
         die("Invalid action");
     }
 
@@ -60,10 +61,11 @@ if ($_POST['action'] === 'accept') {
         preg_replace('#^data:image/\w+;base64,#', '', $signature)
     );
 
-    $dir = "../../uploads/signatures/";
-    if (!is_dir($dir)) mkdir($dir, 0777, true);
+    $dir = $_SERVER['DOCUMENT_ROOT'] . "/trial_project/uploads/signatures/";
+if (!is_dir($dir)) mkdir($dir, 0777, true);
 
-    $path = $dir . "manufacturer_" . $agreement_id . ".png";
+$path = $dir . "wholesaler_" . time() . ".png";
+
     file_put_contents($path, $sig);
 
     $upd = $mysqli->prepare("
@@ -110,7 +112,7 @@ if ($_POST['action'] === 'accept') {
 
 <hr>
 
-<?php if ($status === 'pending_wholesaler'): ?>
+<?php if ($status === 'pending_manufacturer'): ?>
 
 <!-- ================= ACTION BUTTONS ================= -->
 <div style="display:flex;gap:15px;margin-top:20px;">

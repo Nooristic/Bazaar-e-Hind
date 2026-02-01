@@ -5,7 +5,7 @@ const tents = [
     desc: "Discover premium & exclusive collections",
     img: "../../assests/tent-catalog.jpg",
     icon: "🧵",
-    link: "browse_fabrics.php"
+    link: "/trial_project/src/Wholesaler/prod.php"
   },
   {
     key: "orders",
@@ -13,7 +13,7 @@ const tents = [
     desc: "Track pending, processing & completed orders",
     img: "../../assests/tent-orders.jpg",
     icon: "📦",
-    link: "orders_wholesaler.php"
+    link: "/trial_project/src/Wholesaler/orders.php"
   },
   {
     key: "chat",
@@ -21,7 +21,7 @@ const tents = [
     desc: "Negotiate & connect with manufacturers",
     img: "../../assests/tent-chat.jpg",
     icon: "💬",
-    link: "chat_wholesaler.html"
+    link: "/trial_project/src/Wholesaler/messages.html"
   },
   {
     key: "samples",
@@ -29,7 +29,7 @@ const tents = [
     desc: "Request & manage fabric samples",
     img: "../../assests/tent-samples.jpg",
     icon: "📋",
-    link: "samples_wholesaler.php"
+    link: "/trial_project/src/Wholesaler/sample_management.php"
   },
   {
     key: "exclusive",
@@ -37,7 +37,7 @@ const tents = [
     desc: "View & request exclusive fabric access",
     img: "../../assests/tent-exclusivity.jpg",
     icon: "🤝",
-    link: "exclusivity_agreement.php"
+    link: "/trial_project/src/Wholesaler/exclusivity_agreement.php"
   },
   {
     key: "payments",
@@ -45,7 +45,7 @@ const tents = [
     desc: "Manage payments, receipts & dues",
     img: "../../assests/tent-orders.jpg",
     icon: "₹",
-    link: "payments_wholesaler.php"
+    link: "/trial_project/src/Wholesaler/payment_management.php"
   },
   {
     key: "forum",
@@ -53,7 +53,7 @@ const tents = [
     desc: "Discuss trends & textile industry updates",
     img: "../../assests/tent-forum.jpg",
     icon: "🌐",
-    link: "forum_wholesaler.php"
+    link: "/trial_project/src/Wholesaler/community_forum.php"
   },
   {
     key: "profile",
@@ -61,7 +61,7 @@ const tents = [
     desc: "Update account, GST & preferences",
     img: "../../assests/tent-settings.jpg",
     icon: "⚙️",
-    link: "profile_wholesaler.php"
+    link: "/trial_project/src/Wholesaler/settings.php"
   }
 ];
 

@@ -5,7 +5,7 @@ if (!isset($_SESSION['logged_in'])) {
     die("Unauthorized");
 }
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -13,24 +13,14 @@ use Dompdf\Options;
 /* ---------------- IMAGE EMBED (BASE64 for local) ---------------- */
 function dompdfImage($path)
 {
-    if (!$path) return null;
-
-    // If URL (http/https) - keep as is (remote enabled)
-    if (preg_match('/^https?:\/\//', $path)) {
-        return $path;
+    if (!$path || !file_exists($path)) {
+        return null;
     }
 
-    // Convert relative → absolute
-    if (!file_exists($path)) {
-        $path = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($path, '/');
-    }
-
-    if (!file_exists($path)) return null;
-
-    // Embed as base64
     $data = file_get_contents($path);
-    $type = pathinfo($path, PATHINFO_EXTENSION);
-    return 'data:image/' . $type . ';base64,' . base64_encode($data);
+    $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+    return 'data:image/' . $ext . ';base64,' . base64_encode($data);
 }
 
 /* ---------------- DB ---------------- */
