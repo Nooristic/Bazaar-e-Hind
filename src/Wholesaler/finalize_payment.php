@@ -59,9 +59,10 @@ try {
         throw new Exception("Invoice already settled");
     }
 
-    if (!in_array($invoice['order_status'], ['confirmed','in_production'])) {
-        throw new Exception("Payment not allowed at this stage");
-    }
+    // Payment is governed by invoice status, not order status
+   if ($requested <= 0) {
+    throw new Exception("Payment amount must be greater than zero");
+}
 
     /* ================= PAYMENT CALCULATIONS ================= */
     $remaining   = max(0, $invoice['invoice_amount'] - $invoice['amount_paid']);
@@ -141,9 +142,23 @@ try {
     $rec->close();
 
     /* ================= GENERATE RECEIPT PDF ================= */
-    $dompdf = new Dompdf(['isRemoteEnabled' => true]);
+$dompdf = new Dompdf([
+    'isRemoteEnabled' => true,
+    'defaultFont' => 'DejaVu Sans'
+]);
 
     $html = "
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
     <h2 style='text-align:center'>PAYMENT RECEIPT</h2>
     <p><strong>Receipt:</strong> RCP-$receipt_id</p>
     <p><strong>Date:</strong> ".date('Y-m-d')."</p>
@@ -156,8 +171,9 @@ try {
     <p><strong>Credit Generated:</strong> ₹".number_format($credit,2)."</p>
     <p><strong>Total Paid:</strong> ₹".number_format($newPaid,2)."</p>
     <p><strong>Invoice Status:</strong> ".strtoupper($newInvoiceStatus)."</p>
-    ";
-
+</body>
+</html>
+";
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4');
     $dompdf->render();

@@ -40,7 +40,12 @@ $stmt->close();
 if (
     !$invoice ||
     $invoice['invoice_status'] !== 'unpaid' ||
-    !in_array($invoice['order_status'], ['confirmed', 'in_production', 'dispatched'])
+    !in_array($invoice['order_status'], [
+        'confirmed',
+        'in_production',
+        'dispatched',
+        'delivered'
+    ])
 ) {
     die("Payment not allowed");
 }

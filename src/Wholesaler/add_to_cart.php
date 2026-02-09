@@ -1,141 +1,152 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
 header('Content-Type: application/json');
 
+/* ===============================
+   AUTH CHECK
+================================ */
 if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'wholesaler') {
-    echo json_encode(['status' => 'error', 'msg' => 'Unauthorized']);
-    exit;
-}
-
-$wholesaler_id   = (int) $_SESSION['user_id'];
-$fabric_id       = (int) ($_POST['fabric_id'] ?? 0);
-$manufacturer_id = (int) ($_POST['manufacturer_id'] ?? 0);
-$quantity        = (int) ($_POST['quantity'] ?? 0);
-
-if ($fabric_id <= 0 || $manufacturer_id <= 0 || $quantity <= 0) {
-    echo json_encode(['status' => 'error', 'msg' => 'Invalid data']);
-    exit;
-}
-
-$conn = new mysqli("localhost", "root", "", "bazaar_e_hind");
-if ($conn->connect_error) {
-    echo json_encode(['status' => 'error', 'msg' => 'DB error']);
-    exit;
-}
-$conn->set_charset("utf8mb4");
-
-
-
-/* ======================================================
-   🔐 1️⃣ EXCLUSIVITY + VISIBILITY CHECK (CRITICAL)
-   ====================================================== */
-
-$accessCheck = $conn->prepare("
-    SELECT f.fabric_id
-    FROM fabrics f
-
-    LEFT JOIN fabric_exclusive_access fe
-      ON fe.fabric_id = f.fabric_id
-      AND fe.is_active = 1
-      AND CURDATE() BETWEEN fe.start_date AND fe.end_date
-
-    WHERE f.fabric_id = ?
-      AND f.user_id = ?
-      AND f.status = 'approved'
-      AND f.is_active = 1
-      AND (
-          f.visibility_type = 'public'
-          OR fe.wholesaler_id = ?
-      )
-    LIMIT 1
-");
-
-$accessCheck->bind_param(
-    "iii",
-    $fabric_id,
-    $manufacturer_id,
-    $wholesaler_id
-);
-
-$accessCheck->execute();
-$accessCheck->store_result();
-
-if ($accessCheck->num_rows === 0) {
     echo json_encode([
         'status' => 'error',
-        'msg' => 'This fabric is not available for you'
+        'msg'    => 'Unauthorized'
     ]);
     exit;
 }
 
-
-
-/* ======================================================
-   🛒 2️⃣ ADD / UPDATE CART (SAFE NOW)
-   ====================================================== */
-
-$check = $conn->prepare("
-    SELECT cart_id, quantity
-    FROM cart
-    WHERE wholesaler_id = ?
-      AND fabric_id = ?
-");
-$check->bind_param("ii", $wholesaler_id, $fabric_id);
-$check->execute();
-$res = $check->get_result();
-
-if ($row = $res->fetch_assoc()) {
-    $newQty = $row['quantity'] + $quantity;
-
-    $upd = $conn->prepare("
-        UPDATE cart
-        SET quantity = ?
-        WHERE cart_id = ?
-    ");
-    $upd->bind_param("ii", $newQty, $row['cart_id']);
-    $upd->execute();
-} else {
-    $ins = $conn->prepare("
-        INSERT INTO cart
-        (wholesaler_id, manufacturer_id, fabric_id, quantity)
-        VALUES (?, ?, ?, ?)
-    ");
-    $ins->bind_param(
-        "iiii",
-        $wholesaler_id,
-        $manufacturer_id,
-        $fabric_id,
-        $quantity
-    );
-    $ins->execute();
+/* ===============================
+   BASIC VALIDATION
+================================ */
+if (
+    empty($_POST['fabric_id']) ||
+    empty($_POST['manufacturer_id']) ||
+    empty($_POST['quantity'])
+) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Invalid request'
+    ]);
+    exit;
 }
 
+$wholesaler_id   = (int) $_SESSION['user_id'];
+$fabric_id       = (int) $_POST['fabric_id'];
+$manufacturer_id = (int) $_POST['manufacturer_id'];
+$quantity        = (int) $_POST['quantity'];
 
+if ($quantity < 1) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Invalid quantity'
+    ]);
+    exit;
+}
 
-/* ======================================================
-   🔢 3️⃣ UPDATED CART COUNT
-   ====================================================== */
+/* ===============================
+   DB CONNECTION
+================================ */
+$mysqli = new mysqli("localhost", "root", "", "bazaar_e_hind");
+if ($mysqli->connect_error) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Database connection failed'
+    ]);
+    exit;
+}
+$mysqli->set_charset("utf8mb4");
 
-$countStmt = $conn->prepare("
-    SELECT COUNT(*) FROM cart WHERE wholesaler_id = ?
+/* ===============================
+   FETCH MOQ (BACKEND ENFORCEMENT)
+================================ */
+$moqStmt = $mysqli->prepare("
+    SELECT moq
+    FROM fabrics
+    WHERE fabric_id = ? AND is_active = 1
+");
+$moqStmt->bind_param("i", $fabric_id);
+$moqStmt->execute();
+$moqStmt->bind_result($moq);
+$moqStmt->fetch();
+$moqStmt->close();
+
+if (!$moq) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Fabric not available'
+    ]);
+    exit;
+}
+
+if ($quantity < $moq) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => "Minimum order quantity is $moq"
+    ]);
+    exit;
+}
+
+/* ===============================
+   PREVENT DUPLICATES
+================================ */
+$checkStmt = $mysqli->prepare("
+    SELECT cart_id
+    FROM cart
+    WHERE wholesaler_id = ? AND fabric_id = ?
+");
+
+$checkStmt->bind_param("ii", $wholesaler_id, $fabric_id);
+$checkStmt->execute();
+$checkStmt->store_result();
+
+if ($checkStmt->num_rows > 0) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Item already in cart'
+    ]);
+    exit;
+}
+$checkStmt->close();
+
+/* ===============================
+   INSERT INTO CART (NO COLOR)
+================================ */
+$insertStmt = $mysqli->prepare("
+    INSERT INTO cart (wholesaler_id, fabric_id, manufacturer_id, quantity)
+    VALUES (?, ?, ?, ?)
+");
+$insertStmt->bind_param(
+    "iiii",
+    $wholesaler_id,
+    $fabric_id,
+    $manufacturer_id,
+    $quantity
+);
+
+if (!$insertStmt->execute()) {
+    echo json_encode([
+        'status' => 'error',
+        'msg'    => 'Failed to add item to cart'
+    ]);
+    exit;
+}
+$insertStmt->close();
+
+/* ===============================
+   UPDATED CART COUNT
+================================ */
+$countStmt = $mysqli->prepare("
+    SELECT COUNT(*)
+    FROM cart
+    WHERE wholesaler_id = ?
 ");
 $countStmt->bind_param("i", $wholesaler_id);
 $countStmt->execute();
 $countStmt->bind_result($cartCount);
 $countStmt->fetch();
-
-$conn->close();
-
-
-
-/* ======================================================
-   ✅ 4️⃣ RESPONSE
-   ====================================================== */
+$countStmt->close();
 
 echo json_encode([
     'status'    => 'ok',
     'cartCount' => $cartCount
 ]);
+
+$mysqli->close();

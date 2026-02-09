@@ -1,12 +1,5 @@
 const tents = [
-  {
-    key: "user-verification",
-    label: "User Verification",
-    desc: "Review & approve pending user documents",
-    img: "../../assets/tent-catalog.jpg",
-    icon: "✅",
-    link: "verify.php"
-  },
+
   {
     key: "verification-queue",
     label: "Verification Queue & Disputes",
@@ -15,14 +8,7 @@ const tents = [
    icon: "📋",
     link: "queue.php"
   },
-  {
-   key: "dispute-resolution",
-    label: "Dispute Resolution",
-    desc: "Manage & resolve buyer-seller disputes",
-    img: "../../assests/tent-chat.jpg",
-   icon: "⚖️",
-    link: "disputes.php"
-  },
+
   {
    key: "content-moderation",
     label: "Content Moderation",
@@ -31,15 +17,7 @@ const tents = [
    icon: "🛡️",
     link: "moderation.php"
   },
-  {
-   key: "listings-moderation",
-    label: "Listings & Forum Moderation",
-    desc: "Approve pending fabrics & review flagged posts",
-    img: "../../assests/tent-exclusivity.jpg",
-    icon: "🧵",
-    link: "listings.php"
-  },
-  
+
   {
     key: "settings",
     label: "Settings",

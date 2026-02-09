@@ -126,7 +126,7 @@ if (!$exists) {
     /* ================= COMMIT ================= */
     $conn->commit();
 
-   header("Location: /trial_project/src/Wholesaler/payment_management.php?invoice_id=$invoice_id");
+   header("Location: /trial_project/src/Manufacturer/order_manufacturer.php?invoice_id=$invoice_id");
    exit();
 
 

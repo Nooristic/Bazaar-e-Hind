@@ -78,8 +78,30 @@ $path = $dir . "wholesaler_" . time() . ".png";
     $upd->bind_param("si", $path, $agreement_id);
     $upd->execute();
 
-    header("Location: manufacturer_exclusivity.php");
+    header("Location: ex_agreements_manufacturer.php");
     exit();
+}
+/* ================= FETCH FABRICS ================= */
+$fabric_ids = json_decode($agreement['fabric_ids'], true) ?? [];
+$fabrics = [];
+
+if (!empty($fabric_ids)) {
+    $placeholders = implode(',', array_fill(0, count($fabric_ids), '?'));
+    $types = str_repeat('i', count($fabric_ids));
+
+    $stmtF = $mysqli->prepare("
+        SELECT fabric_id, name
+        FROM fabrics
+        WHERE fabric_id IN ($placeholders)
+    ");
+    $stmtF->bind_param($types, ...$fabric_ids);
+    $stmtF->execute();
+    $res = $stmtF->get_result();
+
+    while ($row = $res->fetch_assoc()) {
+        $fabrics[] = $row;
+    }
+    $stmtF->close();
 }
 
 ?>
@@ -91,62 +113,127 @@ $path = $dir . "wholesaler_" . time() . ".png";
 <link rel="stylesheet" href="../css_all_pages.css">
 </head>
 
-<body>
+<body style="background:#f4efe7;">
 
-<h2>Exclusivity Agreement</h2>
+<div style="
+  max-width:900px;
+  margin:40px auto;
+  background:#fff;
+  padding:35px;
+  border-radius:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
+">
 
-<p><strong>Wholesaler:</strong> <?= htmlspecialchars($agreement['wholesaler_name']) ?></p>
-<p><strong>Duration:</strong>
-  <?= date('d M Y', strtotime($agreement['start_date'])) ?> –
-  <?= date('d M Y', strtotime($agreement['end_date'])) ?>
-</p>
+  <h2 style="text-align:center;color:#6d4c1e;margin-bottom:8px;">
+    Exclusivity Agreement
+  </h2>
 
-<p><strong>Status:</strong>
-  <?= ucwords(str_replace('_',' ', $agreement['status'])) ?>
-</p>
+  <p style="text-align:center;color:#777;font-size:14px;margin-bottom:25px;">
+    Agreement ID: EA<?= str_pad($agreement_id,5,'0',STR_PAD_LEFT) ?>
+  </p>
 
-<hr>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <p><strong>Wholesaler:</strong><br><?= htmlspecialchars($agreement['wholesaler_name']) ?></p>
+    <p><strong>Status:</strong><br><?= ucwords(str_replace('_',' ', $agreement['status'])) ?></p>
+  </div>
 
-<h4>Terms & Conditions</h4>
-<p><?= nl2br(htmlspecialchars($agreement['terms'])) ?></p>
+  <p style="margin-top:10px;">
+    <strong>Duration:</strong><br>
+    <?= date('d M Y', strtotime($agreement['start_date'])) ?> –
+    <?= date('d M Y', strtotime($agreement['end_date'])) ?>
+  </p>
 
-<hr>
+  <!-- ================= FABRICS ================= -->
+  <hr style="margin:25px 0">
 
-<?php if ($status === 'pending_manufacturer'): ?>
+  <h4 style="color:#6d4c1e;">Exclusive Fabrics</h4>
 
-<!-- ================= ACTION BUTTONS ================= -->
-<div style="display:flex;gap:15px;margin-top:20px;">
+  <?php if ($fabrics): ?>
+    <table style="
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      background:#fff9e6;
+      border-radius:10px;
+      overflow:hidden;
+    ">
+      <tr style="background:#e7d2a3;">
+        <th style="padding:10px;text-align:left;">Fabric ID</th>
+        <th style="padding:10px;text-align:left;">Fabric Name</th>
+      </tr>
+      <?php foreach ($fabrics as $f): ?>
+      <tr>
+        <td style="padding:10px;border-top:1px solid #ddd;">
+          F<?= str_pad($f['fabric_id'],4,'0',STR_PAD_LEFT) ?>
+        </td>
+        <td style="padding:10px;border-top:1px solid #ddd;">
+          <?= htmlspecialchars($f['name']) ?>
+        </td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  <?php else: ?>
+    <p>No fabrics listed.</p>
+  <?php endif; ?>
 
-  <button class="submit-btn" onclick="showSignature()">
-    Accept
-  </button>
+  <!-- ================= TERMS ================= -->
+  <hr style="margin:25px 0">
 
-  <form method="POST" onsubmit="return confirm('Reject this agreement? It will be deleted.');">
-    <input type="hidden" name="action" value="reject">
-    <button class="submit-btn" style="background:#b33;">
-      Reject
-    </button>
+  <h4 style="color:#6d4c1e;">Terms & Conditions</h4>
+  <p style="line-height:1.6;color:#444;">
+    <?= nl2br(htmlspecialchars($agreement['terms'])) ?>
+  </p>
+
+  <!-- ================= ACTIONS ================= -->
+  <?php if ($status === 'pending_manufacturer'): ?>
+
+  <hr style="margin:30px 0">
+
+  <div style="display:flex;gap:15px;">
+    <button class="submit-btn" onclick="showSignature()">Accept</button>
+
+    <form method="POST"
+          onsubmit="return confirm('Reject this agreement?');">
+      <input type="hidden" name="action" value="reject">
+      <button class="submit-btn" style="background:#b33;">
+        Reject
+      </button>
+    </form>
+  </div>
+
+  <!-- ================= SIGNATURE ================= -->
+  <form method="POST" id="sign-form" style="display:none;margin-top:25px;">
+    <input type="hidden" name="action" value="accept">
+    <input type="hidden" name="signature" id="signature">
+
+    <h4 style="color:#6d4c1e;">Digital Signature</h4>
+
+    <canvas id="signature-pad"
+      style="
+        width:100%;
+        height:180px;
+        border:2px dashed #c9a24d;
+        border-radius:10px;
+        background:#fff;
+      ">
+    </canvas>
+
+    <div style="margin-top:15px;display:flex;gap:10px;">
+      <button type="button"
+              class="submit-btn"
+              style="background:#999;"
+              onclick="clearSig()">Clear</button>
+
+      <button type="submit"
+              class="submit-btn">
+        Confirm & Sign
+      </button>
+    </div>
   </form>
 
+  <?php endif; ?>
+
 </div>
-
-<!-- ================= SIGNATURE ================= -->
-<form method="POST" id="sign-form" style="display:none;margin-top:25px;">
-  <input type="hidden" name="action" value="accept">
-  <input type="hidden" name="signature" id="signature">
-
-  <h4>Digital Signature</h4>
-  <canvas id="signature-pad"
-    style="width:100%;height:180px;border:2px dashed #c9a24d;border-radius:8px;">
-  </canvas>
-
-  <div style="margin-top:15px;display:flex;gap:10px;">
-    <button type="button" class="submit-btn" style="background:#999;" onclick="clearSig()">Clear</button>
-    <button type="submit" class="submit-btn">Confirm & Sign</button>
-  </div>
-</form>
-
-<?php endif; ?>
 
 <script>
 const canvas = document.getElementById("signature-pad");

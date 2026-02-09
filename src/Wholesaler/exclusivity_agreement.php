@@ -397,6 +397,11 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.style.display = "none";
     }
   });
+   // 🔥 FORCE initial load if a manufacturer is already selected
+  const manufacturerSelect = document.getElementById("manufacturer-select");
+  if (manufacturerSelect && manufacturerSelect.value) {
+    manufacturerSelect.dispatchEvent(new Event("change"));
+  }
 
   /* ================= SIGNATURE ================= */
   let canvas, ctx, drawing = false;
@@ -482,23 +487,27 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       fetch("ajax_get_fabrics.php?manufacturer_id=" + manufacturerId)
-        .then(r => r.json())
-        .then(data => {
-          fabricSelect.innerHTML = "";
-          if (!data.length) {
-            fabricSelect.innerHTML = "<option>No fabrics available</option>";
-            return;
-          }
-          data.forEach(f => {
-            const opt = document.createElement("option");
-            opt.value = f.fabric_id;
-            opt.textContent = f.name;
-            fabricSelect.appendChild(opt);
-          });
-        })
-        .catch(() => {
-          fabricSelect.innerHTML = "<option>Error loading fabrics</option>";
-        });
+  .then(r => {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  })
+  .then(data => {
+    fabricSelect.innerHTML = "";
+    if (!data.length) {
+      fabricSelect.innerHTML = "<option>No fabrics available</option>";
+      return;
+    }
+    data.forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f.fabric_id;
+      opt.textContent = f.name;
+      fabricSelect.appendChild(opt);
+    });
+  })
+  .catch(err => {
+    console.error("Fabric load error:", err);
+    fabricSelect.innerHTML = "<option>Error loading fabrics</option>";
+  });
     });
 
 });
