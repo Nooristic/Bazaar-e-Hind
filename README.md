@@ -1,8 +1,8 @@
-## Bazaar-e-Hind 🧵
+## Bazaar-e-Hind ## 🧵
 
 A Digital B2B Marketplace for Indian Textiles
 
-Bazaar-e-Hind is a secure, web-based B2B marketplace designed to digitalise the Indian textile industry. It eliminates traditional trade friction points—such as lack of transparency, geographical limitations, high intermediary dependence, heavy manual workflows, and fragmented communication—by providing a direct, centralized bridge between textile manufacturers and wholesalers across India.
+Bazaar-e-Hind is a secure, web-based B2B marketplace designed to digitalise the Indian textile industry. It eliminates traditional trade friction points, such as lack of transparency, geographical limitations, high intermediary dependence, heavy manual workflows, and fragmented communication by providing a direct, centralized bridge between textile manufacturers and wholesalers across India.
 ------------------------------
 ## 🎯 Key Objectives
 
@@ -23,27 +23,6 @@ Bazaar-e-Hind is a secure, web-based B2B marketplace designed to digitalise the 
 ------------------------------
 ## 👥 System Roles & Core Modules
 The platform structurally segments permissions into three primary operational vectors:
-
-                      +-------------------+
-
-                      |   BAZAAR-E-HIND   |
-                      +---------+---------+
-                                |
-        +-----------------------+-----------------------+
-
-        |                       |                       |
-        v                       v                       v
-+---------------+       +---------------+       +---------------+
-
-|  ADMIN PANEL  |       | MANUFACTURER  |       |  WHOLESALER   |
-+---------------+       +---------------+       +---------------+
-
-| • User Audits |       | • Upload Hub  |       | • Search UI   |
-| • Content Mod |       | • Order Rules |       | • Cart Engine |
-|               |       | • Sample Log  |       | • Sample Req  |
-|               |       | • Ledger Core |       | • Credit Check|
-|               |       | • Legal Sign  |       | • Legal Draft |
-+---------------+       +---------------+       +---------------+
 
 ## 1. Admin Panel
 
